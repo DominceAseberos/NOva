@@ -1,0 +1,1813 @@
+{
+  "schemaVersion": "1.0",
+  "project": {
+    "id": "nova",
+    "name": "NOVA"
+  },
+  "settings": {
+    "cursorDesktop": 0.52,
+    "cursorMobile": 0.34
+  },
+  "sections": [
+    {
+      "id": "top",
+      "label": "Hero",
+      "selector": "#top",
+      "stageSelector": ".hero-stage",
+      "duration": 320,
+      "pin": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "performance",
+      "label": "Internals",
+      "selector": "#performance",
+      "stageSelector": ".scene-stage",
+      "duration": 520,
+      "pin": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "display",
+      "label": "Exterior",
+      "selector": "#display",
+      "stageSelector": ".scene-stage",
+      "duration": 330,
+      "pin": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "mobility",
+      "label": "Hardware",
+      "selector": "#mobility",
+      "stageSelector": ".scene-stage",
+      "duration": 220,
+      "pin": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "design",
+      "label": "Design",
+      "selector": "#design",
+      "stageSelector": ".scene-stage",
+      "duration": 220,
+      "pin": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "final",
+      "label": "Final",
+      "selector": "#final",
+      "stageSelector": ".scene-stage",
+      "duration": 180,
+      "pin": {
+        "enabled": true
+      }
+    }
+  ],
+  "tracks": {
+    "product": [
+      {
+        "id": "arrival",
+        "section": "top",
+        "progress": 0,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 1.101,
+          "y": 0.089,
+          "z": 0.587,
+          "rx": 0.75007,
+          "ry": -0.69377,
+          "rz": 0.60653,
+          "scale": 0.74,
+          "lid": 0.08,
+          "keyboardLight": 0,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.18,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "hero-open",
+        "section": "top",
+        "progress": 0.1,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 1.101,
+          "y": 0.089,
+          "z": 0.587,
+          "rx": 0.75007,
+          "ry": -0.69377,
+          "rz": 0.60653,
+          "scale": 0.74,
+          "lid": 1,
+          "keyboardLight": 0.15,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.18,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "hero-light",
+        "section": "top",
+        "progress": 0.18,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 1.101,
+          "y": 0.089,
+          "z": 0.587,
+          "rx": 0.75007,
+          "ry": -0.69377,
+          "rz": 0.60653,
+          "scale": 0.74,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.18,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "product-top-718",
+        "section": "top",
+        "progress": 0.25117,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 1.114,
+          "y": 0.05,
+          "z": 0.533,
+          "rx": 1.21204,
+          "ry": 1.05196,
+          "rz": -1.13404,
+          "scale": 0.741,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.826,
+          "warm": 1.128,
+          "ambient": 1.242,
+          "shadow": 0.186,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "product-top-3574",
+        "section": "top",
+        "progress": 0.37644,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 1.249,
+          "y": 0.049,
+          "z": 0.244,
+          "rx": 3.13126,
+          "ry": -0.6807,
+          "rz": -3.01857,
+          "scale": 0.749,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.999,
+          "warm": 1.315,
+          "ambient": 1.185,
+          "shadow": 0.226,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "product-top-4650",
+        "section": "top",
+        "progress": 0.49684,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 1.386,
+          "y": 0.047,
+          "z": -0.051,
+          "rx": 1.75443,
+          "ry": -0.95155,
+          "rz": 2.0128,
+          "scale": 0.757,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 3.176,
+          "warm": 1.505,
+          "ambient": 1.126,
+          "shadow": 0.267,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "product-top-9732",
+        "section": "top",
+        "progress": 0.68688,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 0.136,
+          "y": 0.041,
+          "z": -1.199,
+          "rx": 0.19483,
+          "ry": 0.02797,
+          "rz": -0.01936,
+          "scale": 0.789,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 1,
+          "cool": 3.864,
+          "warm": 2.246,
+          "ambient": 0.898,
+          "shadow": 0.426,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "product-top-8973",
+        "section": "top",
+        "progress": 0.89731,
+        "chapter": "ARRIVAL",
+        "ease": "smooth",
+        "state": {
+          "x": 0.025,
+          "y": 0.041,
+          "z": 1.844,
+          "rx": 0.19483,
+          "ry": 0.02797,
+          "rz": -0.01936,
+          "scale": 0.789,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 1,
+          "cool": 3.864,
+          "warm": 2.246,
+          "ambient": 0.898,
+          "shadow": 0.426,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-intro",
+        "section": "performance",
+        "progress": 0.02,
+        "chapter": "PERFORMANCE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.76,
+          "y": 0.03,
+          "z": 0.18,
+          "rx": 0.34,
+          "ry": 0.02,
+          "rz": -0.01,
+          "scale": 0.82,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.5,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-explode",
+        "section": "performance",
+        "progress": 0.11,
+        "chapter": "EXPLODE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.58,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-board",
+        "section": "performance",
+        "progress": 0.22,
+        "chapter": "MOTHERBOARD",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.62,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "motherboard": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.32,
+                1.32,
+                1.32
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-gpu",
+        "section": "performance",
+        "progress": 0.34,
+        "chapter": "GPU",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.67,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "gpu": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                4,
+                4,
+                4
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-cpu",
+        "section": "performance",
+        "progress": 0.45,
+        "chapter": "CPU",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.67,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "cpu": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                4,
+                4,
+                4
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-memory",
+        "section": "performance",
+        "progress": 0.56,
+        "chapter": "MEMORY",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.64,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "ram1": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                2.25,
+                2.25,
+                2.25
+              ]
+            },
+            "ram2": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                2.25,
+                2.25,
+                2.25
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-storage",
+        "section": "performance",
+        "progress": 0.66,
+        "chapter": "STORAGE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.66,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "ssd": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                -0.06
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                3.8,
+                3.8,
+                3.8
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-cooling",
+        "section": "performance",
+        "progress": 0.77,
+        "chapter": "COOLING",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.61,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "fanLeft": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.3,
+                1.3,
+                1.3
+              ]
+            },
+            "fanRight": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.3,
+                1.3,
+                1.3
+              ]
+            },
+            "heatPipe1": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.2,
+                1.2,
+                1.2
+              ]
+            },
+            "heatPipe2": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.2,
+                1.2,
+                1.2
+              ]
+            },
+            "heatsinkLeft": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.24,
+                1.24,
+                1.24
+              ]
+            },
+            "heatsinkRight": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.24,
+                1.24,
+                1.24
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-battery",
+        "section": "performance",
+        "progress": 0.87,
+        "chapter": "BATTERY",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.61,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "battery1": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.2,
+                1.2,
+                1.2
+              ]
+            },
+            "battery2": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.2,
+                1.2,
+                1.2
+              ]
+            },
+            "battery3": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.2,
+                1.2,
+                1.2
+              ]
+            },
+            "battery4": {
+              "visible": true,
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.2,
+                1.2,
+                1.2
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-reassemble",
+        "section": "performance",
+        "progress": 0.98,
+        "chapter": "REASSEMBLE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.83,
+          "y": 0.03,
+          "z": 0,
+          "rx": 0.24,
+          "ry": -0.28,
+          "rz": -0.04,
+          "scale": 0.76,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.5,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "ext-display",
+        "section": "display",
+        "progress": 0.02,
+        "chapter": "DISPLAY",
+        "ease": "smooth",
+        "state": {
+          "x": 0.82,
+          "y": 0.02,
+          "z": 0,
+          "rx": -0.07,
+          "ry": -0.16,
+          "rz": 0.01,
+          "scale": 0.9,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.5,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "ext-screen-thin",
+        "section": "display",
+        "progress": 0.24,
+        "chapter": "SCREEN_THIN",
+        "ease": "smooth",
+        "state": {
+          "x": 1.05,
+          "y": 0.01,
+          "z": 0,
+          "rx": 0,
+          "ry": -1.57,
+          "rz": 0,
+          "scale": 1.18,
+          "lid": 1,
+          "keyboardLight": 0.28,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.28,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "ext-profile",
+        "section": "display",
+        "progress": 0.44,
+        "chapter": "PROFILE",
+        "ease": "smooth",
+        "state": {
+          "x": 1.04,
+          "y": 0.02,
+          "z": 0,
+          "rx": 0,
+          "ry": -1.57,
+          "rz": 0,
+          "scale": 1.22,
+          "lid": 0.02,
+          "keyboardLight": 0,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.24,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "ext-keyboard-a",
+        "section": "display",
+        "progress": 0.6,
+        "chapter": "KEYBOARD",
+        "ease": "smooth",
+        "state": {
+          "x": 1.05,
+          "y": -0.1,
+          "z": 0,
+          "rx": 0.62,
+          "ry": -0.18,
+          "rz": -0.03,
+          "scale": 1.58,
+          "lid": 0.78,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.28,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "ext-keyboard-b",
+        "section": "display",
+        "progress": 0.76,
+        "chapter": "KEYBOARD",
+        "ease": "smooth",
+        "state": {
+          "x": 0.72,
+          "y": -0.1,
+          "z": 0,
+          "rx": 0.62,
+          "ry": -0.12,
+          "rz": -0.02,
+          "scale": 1.62,
+          "lid": 0.78,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.28,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "ext-touchpad",
+        "section": "display",
+        "progress": 0.94,
+        "chapter": "TOUCHPAD",
+        "ease": "smooth",
+        "state": {
+          "x": 0.96,
+          "y": 0.1,
+          "z": 0,
+          "rx": 0.68,
+          "ry": -0.1,
+          "rz": -0.02,
+          "scale": 1.48,
+          "lid": 0.82,
+          "keyboardLight": 0.45,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.26,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "hw-ports-a",
+        "section": "mobility",
+        "progress": 0.05,
+        "chapter": "PORTS_RIGHT",
+        "ease": "smooth",
+        "state": {
+          "x": 1.04,
+          "y": -0.02,
+          "z": 0,
+          "rx": 0,
+          "ry": -1.57,
+          "rz": 0,
+          "scale": 1.2,
+          "lid": 0.03,
+          "keyboardLight": 0,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.2,
+          "warm": 0.62,
+          "ambient": 1.05,
+          "shadow": 0.18,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "hw-ports-b",
+        "section": "mobility",
+        "progress": 0.3,
+        "chapter": "PORTS_LEFT",
+        "ease": "smooth",
+        "state": {
+          "x": 1.04,
+          "y": -0.02,
+          "z": 0,
+          "rx": 0,
+          "ry": 1.57,
+          "rz": 0,
+          "scale": 1.2,
+          "lid": 0.03,
+          "keyboardLight": 0,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.2,
+          "warm": 0.62,
+          "ambient": 1.05,
+          "shadow": 0.18,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "hw-exhaust",
+        "section": "mobility",
+        "progress": 0.58,
+        "chapter": "EXHAUST",
+        "ease": "smooth",
+        "state": {
+          "x": 1.12,
+          "y": -0.02,
+          "z": 0,
+          "rx": 0.42,
+          "ry": 3.06,
+          "rz": 0,
+          "scale": 1.02,
+          "lid": 0.56,
+          "keyboardLight": 0.06,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.5,
+          "warm": 0.82,
+          "ambient": 1,
+          "shadow": 0.18,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "hw-speakers",
+        "section": "mobility",
+        "progress": 0.86,
+        "chapter": "SPEAKERS",
+        "ease": "smooth",
+        "state": {
+          "x": 1.12,
+          "y": -0.06,
+          "z": 0,
+          "rx": 0.88,
+          "ry": -0.08,
+          "rz": -0.03,
+          "scale": 0.98,
+          "lid": 0.66,
+          "keyboardLight": 0.48,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2,
+          "warm": 0.55,
+          "ambient": 1.1,
+          "shadow": 0.2,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "design-hinge",
+        "section": "design",
+        "progress": 0.08,
+        "chapter": "HINGE",
+        "ease": "smooth",
+        "state": {
+          "x": 1.1,
+          "y": -0.01,
+          "z": 0,
+          "rx": 0.38,
+          "ry": 3.02,
+          "rz": 0,
+          "scale": 1.04,
+          "lid": 0.62,
+          "keyboardLight": 0.08,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.45,
+          "warm": 0.9,
+          "ambient": 1,
+          "shadow": 0.16,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "design-edge",
+        "section": "design",
+        "progress": 0.46,
+        "chapter": "EDGE",
+        "ease": "smooth",
+        "state": {
+          "x": 1.1,
+          "y": 0.04,
+          "z": 0,
+          "rx": 0.1,
+          "ry": 1.28,
+          "rz": 0.02,
+          "scale": 1.03,
+          "lid": 0.42,
+          "keyboardLight": 0.1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.6,
+          "warm": 1,
+          "ambient": 1.25,
+          "shadow": 0.2,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "design-closeup",
+        "section": "design",
+        "progress": 0.84,
+        "chapter": "CLOSEUP",
+        "ease": "smooth",
+        "state": {
+          "x": 1,
+          "y": 0,
+          "z": 0,
+          "rx": 0.42,
+          "ry": -0.36,
+          "rz": -0.04,
+          "scale": 1.02,
+          "lid": 0.92,
+          "keyboardLight": 0.78,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.9,
+          "warm": 1.15,
+          "ambient": 1.25,
+          "shadow": 0.38,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "final-open",
+        "section": "final",
+        "progress": 0.05,
+        "chapter": "FINAL",
+        "ease": "smooth",
+        "state": {
+          "x": 0.78,
+          "y": 0.03,
+          "z": 0,
+          "rx": -0.06,
+          "ry": -0.18,
+          "rz": 0.01,
+          "scale": 0.88,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.5,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "final-close-start",
+        "section": "final",
+        "progress": 0.34,
+        "chapter": "CLOSE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.52,
+          "y": 0.04,
+          "z": 0,
+          "rx": -0.02,
+          "ry": 0.55,
+          "rz": 0.01,
+          "scale": 1,
+          "lid": 1,
+          "keyboardLight": 1,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.42,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "final-close-end",
+        "section": "final",
+        "progress": 0.68,
+        "chapter": "CLOSE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.3,
+          "y": 0.08,
+          "z": 0,
+          "rx": 0.01,
+          "ry": 0.9,
+          "rz": 0,
+          "scale": 1.08,
+          "lid": 0,
+          "keyboardLight": 0,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.8,
+          "warm": 1.1,
+          "ambient": 1.25,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "final-nova",
+        "section": "final",
+        "progress": 0.9,
+        "chapter": "NOVA",
+        "ease": "smooth",
+        "state": {
+          "x": 0.46,
+          "y": 0.04,
+          "z": 0,
+          "rx": 0.08,
+          "ry": -0.62,
+          "rz": -0.02,
+          "scale": 1,
+          "lid": 0,
+          "keyboardLight": 0,
+          "explodeEnabled": true,
+          "explode": 0,
+          "parts": {},
+          "screen": 0,
+          "cool": 2.4,
+          "warm": 1.2,
+          "ambient": 1,
+          "shadow": 0.38,
+          "opacity": 1
+        }
+      }
+    ],
+    "camera": [
+      {
+        "id": "cam-hero",
+        "section": "top",
+        "progress": 0,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.18,
+            4.45
+          ],
+          "target": [
+            0,
+            -0.08,
+            0
+          ],
+          "fov": 36
+        }
+      },
+      {
+        "id": "cam-perf",
+        "section": "performance",
+        "progress": 0.02,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.12,
+            4.25
+          ],
+          "target": [
+            0,
+            -0.06,
+            0
+          ],
+          "fov": 34
+        }
+      },
+      {
+        "id": "cam-board",
+        "section": "performance",
+        "progress": 0.22,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            1,
+            3.82
+          ],
+          "target": [
+            0.18,
+            -0.02,
+            0
+          ],
+          "fov": 27
+        }
+      },
+      {
+        "id": "cam-gpu",
+        "section": "performance",
+        "progress": 0.34,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            0.98,
+            3.68
+          ],
+          "target": [
+            0.2,
+            -0.02,
+            0
+          ],
+          "fov": 25
+        }
+      },
+      {
+        "id": "cam-cpu",
+        "section": "performance",
+        "progress": 0.45,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            0.98,
+            3.68
+          ],
+          "target": [
+            0.2,
+            -0.02,
+            0
+          ],
+          "fov": 25
+        }
+      },
+      {
+        "id": "cam-memory",
+        "section": "performance",
+        "progress": 0.56,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            1,
+            3.78
+          ],
+          "target": [
+            0.2,
+            -0.02,
+            0
+          ],
+          "fov": 26
+        }
+      },
+      {
+        "id": "cam-storage",
+        "section": "performance",
+        "progress": 0.66,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            0.96,
+            3.58
+          ],
+          "target": [
+            0.22,
+            -0.02,
+            0
+          ],
+          "fov": 24
+        }
+      },
+      {
+        "id": "cam-cooling",
+        "section": "performance",
+        "progress": 0.77,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            1,
+            3.78
+          ],
+          "target": [
+            0.2,
+            -0.02,
+            0
+          ],
+          "fov": 26
+        }
+      },
+      {
+        "id": "cam-battery",
+        "section": "performance",
+        "progress": 0.87,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.02,
+            1,
+            3.82
+          ],
+          "target": [
+            0.2,
+            -0.04,
+            0
+          ],
+          "fov": 27
+        }
+      },
+      {
+        "id": "cam-perf-end",
+        "section": "performance",
+        "progress": 0.96,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.12,
+            4.3
+          ],
+          "target": [
+            0,
+            -0.06,
+            0
+          ],
+          "fov": 34
+        }
+      },
+      {
+        "id": "cam-display",
+        "section": "display",
+        "progress": 0.02,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.12,
+            4.2
+          ],
+          "target": [
+            0,
+            -0.07,
+            0
+          ],
+          "fov": 33
+        }
+      },
+      {
+        "id": "cam-screen-thin",
+        "section": "display",
+        "progress": 0.24,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.98,
+            3.7
+          ],
+          "target": [
+            0.2,
+            -0.01,
+            0
+          ],
+          "fov": 25
+        }
+      },
+      {
+        "id": "cam-profile",
+        "section": "display",
+        "progress": 0.44,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.98,
+            3.7
+          ],
+          "target": [
+            0.2,
+            -0.01,
+            0
+          ],
+          "fov": 25
+        }
+      },
+      {
+        "id": "cam-keyboard-left",
+        "section": "display",
+        "progress": 0.6,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            -0.14,
+            1,
+            3.78
+          ],
+          "target": [
+            0.12,
+            -0.1,
+            0
+          ],
+          "fov": 27
+        }
+      },
+      {
+        "id": "cam-keyboard-right",
+        "section": "display",
+        "progress": 0.76,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.14,
+            1,
+            3.78
+          ],
+          "target": [
+            0.2,
+            -0.1,
+            0
+          ],
+          "fov": 27
+        }
+      },
+      {
+        "id": "cam-touchpad",
+        "section": "display",
+        "progress": 0.94,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0.04,
+            0.98,
+            3.76
+          ],
+          "target": [
+            0.18,
+            -0.14,
+            0
+          ],
+          "fov": 27
+        }
+      },
+      {
+        "id": "cam-ports-right",
+        "section": "mobility",
+        "progress": 0.05,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.96,
+            3.7
+          ],
+          "target": [
+            0.2,
+            -0.02,
+            0
+          ],
+          "fov": 25
+        }
+      },
+      {
+        "id": "cam-ports-left",
+        "section": "mobility",
+        "progress": 0.3,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.96,
+            3.7
+          ],
+          "target": [
+            0.2,
+            -0.02,
+            0
+          ],
+          "fov": 25
+        }
+      },
+      {
+        "id": "cam-exhaust",
+        "section": "mobility",
+        "progress": 0.58,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.9,
+            3.58
+          ],
+          "target": [
+            0.18,
+            0.1,
+            0
+          ],
+          "fov": 24
+        }
+      },
+      {
+        "id": "cam-speakers",
+        "section": "mobility",
+        "progress": 0.86,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.92,
+            3.72
+          ],
+          "target": [
+            0.18,
+            -0.1,
+            0
+          ],
+          "fov": 26
+        }
+      },
+      {
+        "id": "cam-hinge",
+        "section": "design",
+        "progress": 0.08,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.88,
+            3.52
+          ],
+          "target": [
+            0.18,
+            0.1,
+            0
+          ],
+          "fov": 24
+        }
+      },
+      {
+        "id": "cam-edge",
+        "section": "design",
+        "progress": 0.46,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            0.96,
+            3.68
+          ],
+          "target": [
+            0.18,
+            -0.02,
+            0
+          ],
+          "fov": 26
+        }
+      },
+      {
+        "id": "cam-closeup",
+        "section": "design",
+        "progress": 0.84,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1,
+            3.82
+          ],
+          "target": [
+            0.18,
+            -0.08,
+            0
+          ],
+          "fov": 28
+        }
+      },
+      {
+        "id": "cam-final",
+        "section": "final",
+        "progress": 0.05,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.16,
+            4.35
+          ],
+          "target": [
+            0,
+            -0.07,
+            0
+          ],
+          "fov": 34
+        }
+      },
+      {
+        "id": "cam-close",
+        "section": "final",
+        "progress": 0.5,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.02,
+            4
+          ],
+          "target": [
+            0,
+            -0.02,
+            0
+          ],
+          "fov": 30
+        }
+      },
+      {
+        "id": "cam-nova",
+        "section": "final",
+        "progress": 0.9,
+        "ease": "smooth",
+        "state": {
+          "position": [
+            0,
+            1.12,
+            4.25
+          ],
+          "target": [
+            0,
+            -0.04,
+            0
+          ],
+          "fov": 33
+        }
+      }
+    ]
+  }
+}

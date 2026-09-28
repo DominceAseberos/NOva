@@ -4,13 +4,36 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run build",
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "qa:desktop": "node scripts/qa.mjs",
+    "qa:mobile": "node scripts/qa-mobile.mjs",
+    "qa:motion": "node scripts/qa-motion.mjs",
+    "qa:transitions": "node scripts/qa-transitions.mjs",
+    "qa:layout": "node scripts/qa-layout.mjs",
+    "qa:performance": "node scripts/qa-performance.mjs",
+    "qa:lenis": "node scripts/qa-lenis.mjs",
+    "qa:story": "node scripts/qa-story-timeline.mjs",
+    "qa:all": "npm test && npm run qa:layout && npm run qa:motion && npm run qa:story",
+    "qa:editor": "node scripts/qa-scroll-story-editor-workflow.mjs && node scripts/qa-editor-advanced.mjs && node scripts/qa-editor-inspector-sync.mjs && node scripts/qa-autokey-timeline.mjs && node scripts/qa-autokey-gizmo-signal.mjs && node scripts/qa-editor-layer-isolation.mjs && node scripts/qa-video-editor-timeline.mjs && node scripts/qa-pin-boundary.mjs && node scripts/qa-pin-capture-live.mjs && node scripts/qa-parts-editor.mjs && node scripts/qa-explode-toggle.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
-    "sharp": "^0.35.4"
+    "@vitejs/plugin-react": "^6.1.1",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "sharp": "^0.35.4",
+    "three": "^0.186.1",
+    "vite": "^8.3.1"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.63.0"
   }
 }

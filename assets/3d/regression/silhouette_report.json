@@ -1,0 +1,56 @@
+{
+  "front": {
+    "referenceBBox": {
+      "width": 2000,
+      "height": 1104,
+      "minX": 38,
+      "minY": 38,
+      "maxX": 1962,
+      "maxY": 1066,
+      "bboxW": 1925,
+      "bboxH": 1029,
+      "aspect": 1.870748299319728,
+      "coverage": 0.4629805253623188
+    },
+    "renderBBox": {
+      "width": 1200,
+      "height": 800,
+      "minX": 86,
+      "minY": 0,
+      "maxX": 1199,
+      "maxY": 731,
+      "bboxW": 1114,
+      "bboxH": 732,
+      "aspect": 1.5218579234972678,
+      "coverage": 0.5007208333333333
+    },
+    "normalizedSilhouetteIoU": 0.6812
+  },
+  "rear": {
+    "referenceBBox": {
+      "width": 2000,
+      "height": 1311,
+      "minX": 40,
+      "minY": 40,
+      "maxX": 1959,
+      "maxY": 1270,
+      "bboxW": 1920,
+      "bboxH": 1231,
+      "aspect": 1.5597075548334687,
+      "coverage": 0.47727765064836003
+    },
+    "renderBBox": {
+      "width": 1200,
+      "height": 800,
+      "minX": 0,
+      "minY": 0,
+      "maxX": 1187,
+      "maxY": 734,
+      "bboxW": 1188,
+      "bboxH": 735,
+      "aspect": 1.616326530612245,
+      "coverage": 0.4905572916666667
+    },
+    "normalizedSilhouetteIoU": 0.5634
+  }
+}

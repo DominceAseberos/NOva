@@ -1,0 +1,97 @@
+{
+  "model": "NOVA Canonical Laptop",
+  "units": "meters",
+  "dimensions": {
+    "width": 0.335,
+    "depth": 0.225,
+    "base_height": 0.01,
+    "lid_width": 0.331,
+    "lid_height": 0.221,
+    "lid_thickness": 0.0048
+  },
+  "lid_lean_degrees": -14.999999999999998,
+  "canonical_reference": "assets/hero/hero-laptop.png",
+  "visible_right_cutouts": 3,
+  "ports": {
+    "right": [
+      "USB-C-class",
+      "USB-C-class",
+      "USB-A-class"
+    ],
+    "left": [
+      "HDMI-class",
+      "USB-A-class",
+      "3.5mm-audio-class"
+    ]
+  },
+  "animatable_groups": [
+    "LID_GROUP",
+    "TOP_DECK_GROUP",
+    "INTERNAL_GROUP",
+    "LOWER_CHASSIS_GROUP"
+  ],
+  "internal_components": [
+    "Motherboard",
+    "CPU_GPU_Package",
+    "CPU_Package",
+    "GPU_Package",
+    "RAM_SODIMM_1",
+    "RAM_SODIMM_2",
+    "SSD_Module",
+    "Fan_L",
+    "Fan_R",
+    "HeatPipe_1",
+    "HeatPipe_2",
+    "Heatsink_L",
+    "Heatsink_R",
+    "Battery_Cell_1",
+    "Battery_Cell_2",
+    "Battery_Cell_3",
+    "Battery_Cell_4",
+    "Internal_Midplate"
+  ],
+  "editor_components": [
+    "Motherboard",
+    "CPU_GPU_Package",
+    "CPU_Package",
+    "GPU_Package",
+    "RAM_SODIMM_1",
+    "RAM_SODIMM_2",
+    "SSD_Module",
+    "Fan_L",
+    "Fan_R",
+    "HeatPipe_1",
+    "HeatPipe_2",
+    "Heatsink_L",
+    "Heatsink_R",
+    "Battery_Cell_1",
+    "Battery_Cell_2",
+    "Battery_Cell_3",
+    "Battery_Cell_4",
+    "Internal_Midplate"
+  ],
+  "reference_basis": [
+    "Framework laptop mainboard photography: dark asymmetric PCB, serviceable memory/storage zones, compact blower and heatpipe packaging",
+    "Crucial DDR5 SO-DIMM photography: dark memory PCB, discrete DRAM packages, gold contact edge and retention hardware",
+    "Premium notebook keyboard/trackpad references: black chiclet keys with restrained white backlight and a large buttonless glass trackpad",
+    "Modern compact notebook hinges: paired barrel/torque sections with small base brackets and lid-side straps"
+  ],
+  "features": [
+    "soft white per-key legend backlight",
+    "large glass-like buttonless trackpad with haptic plate",
+    "multi-part torque-barrel hinge with base brackets",
+    "dark asymmetric motherboard with pads, sockets and mounting points",
+    "separate low-profile CPU and GPU packages with VRAM and cold plates",
+    "dual SO-DIMM-style RAM modules with DRAM ICs and gold contacts",
+    "dense dual blower fans with motor caps",
+    "curved copper heatpipes",
+    "heatsink fin arrays",
+    "segmented battery cells",
+    "recessed side-port cavities"
+  ],
+  "notes": [
+    "Physical geometry is reconstructed from available 2D NOVA references; unseen surfaces and port types are fictionalized NOVA-consistent geometry and cannot be guaranteed exact without CAD or orthographic source views.",
+    "No third-party branding is included.",
+    "The exported GLB preserves editor-facing hardware assemblies while merging detail meshes for web efficiency."
+  ]
+}

@@ -17,7 +17,22 @@ npm-debug.log*
 # Temporary files
 *.tmp
 *-tmp.*
+.qa/
+.qa-mobile/
+.qa-transition/
+.qa-story/
+.qa-story-single/
+.qa-3d/
+qa-*.png
+.qa-*.png
 
 # Documents
 *.docx
 
+.vercel
+.qa-*/
+.qa-story-final*
+*.blend1
+__pycache__/
+*.pyc
+src/story/qa-story-save.json
