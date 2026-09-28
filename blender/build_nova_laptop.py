@@ -1,4 +1,5 @@
-import bpy, math, os, json
+import bpy, math, os, json, re
+import xml.etree.ElementTree as ET
 from mathutils import Vector
 
 # -----------------------------
@@ -72,6 +73,8 @@ PCB_SILK = mat("PCB Silkscreen", (0.10,0.12,0.12), metallic=0.0, roughness=0.88)
 INDUCTOR = mat("VRM Inductor", (0.008,0.010,0.013), metallic=0.18, roughness=0.48)
 RAM_LABEL = mat("RAM Neutral Label", (0.055,0.060,0.068), metallic=0.0, roughness=0.82)
 SMD_TAN = mat("SMD Ceramic", (0.12,0.095,0.060), metallic=0.0, roughness=0.72)
+LOGO_METAL = mat("NOVA Lid Emblem Metal", (0.035,0.050,0.072), metallic=0.98, roughness=0.16)
+LOGO_GLOW = mat("NOVA Lid Emblem Glow", (0.16,0.032,0.008), metallic=0.12, roughness=0.24, emission=(1.0,0.15,0.025), emission_strength=1.25)
 
 # Keep matte engineering plastics/PCBs dark under the bright product studio.
 # Principled's default dielectric specular can otherwise make nearly-black
@@ -223,6 +226,98 @@ def set_camera(name, loc, target=(0,0.01,0.07), lens=58):
 
 def parent_keep(obj, parent):
     obj.parent = parent
+
+
+def polygon_prism_xz(name, points_xz, y_center, depth, material, bevel=0.000055):
+    """Create a shallow prism from one SVG polygon in the lid-local X/Z plane."""
+    count = len(points_xz)
+    y0 = y_center - depth / 2
+    y1 = y_center + depth / 2
+    verts = [(x, y0, z) for x, z in points_xz] + [(x, y1, z) for x, z in points_xz]
+    faces = [list(reversed(range(count))), list(range(count, count * 2))]
+    for index in range(count):
+        nxt = (index + 1) % count
+        faces.append((index, nxt, count + nxt, count + index))
+
+    mesh = bpy.data.meshes.new(name + "_Mesh")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    if material:
+        obj.data.materials.append(material)
+
+    if bevel > 0:
+        bev = obj.modifiers.new("Micro bevel", "BEVEL")
+        bev.width = bevel
+        bev.segments = 2
+        bev.limit_method = 'ANGLE'
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.modifier_apply(modifier=bev.name)
+
+    return obj
+
+
+def build_svg_lid_emblem(svg_path, parent, surface_y, center_z, target_size=0.064):
+    """Read polygon geometry from the reusable NOVA SVG and mount it on the lid.
+
+    The SVG stays the source of truth. Each polygon is converted into a very
+    shallow physical prism so the emblem catches real product lighting and is
+    exported into the canonical GLB instead of being baked into a lid texture.
+    """
+    tree = ET.parse(svg_path)
+    root = tree.getroot()
+    view_box = [float(value) for value in root.attrib.get("viewBox", "0 0 512 512").replace(",", " ").split()]
+    min_x, min_y, box_w, box_h = view_box
+    cx = min_x + box_w / 2
+    cy = min_y + box_h / 2
+    scale = target_size / max(box_w, box_h)
+
+    namespace = "{http://www.w3.org/2000/svg}"
+    polygons = root.findall(f".//{namespace}polygon")
+    if not polygons:
+        polygons = root.findall(".//polygon")
+
+    created = []
+    for index, node in enumerate(polygons, start=1):
+        raw = node.attrib.get("points", "")
+        numbers = [float(value) for value in re.findall(r"[-+]?(?:\d*\.\d+|\d+\.?\d*)", raw)]
+        if len(numbers) < 6 or len(numbers) % 2:
+            continue
+
+        points = []
+        for coord_index in range(0, len(numbers), 2):
+            svg_x = numbers[coord_index]
+            svg_y = numbers[coord_index + 1]
+            x = (svg_x - cx) * scale
+            z = (cy - svg_y) * scale + center_z
+            points.append((x, z))
+
+        material_key = node.attrib.get("data-material", "metal").lower()
+        if material_key == "glow":
+            material = LOGO_GLOW
+            depth = 0.00018
+            gap = 0.000035
+            prefix = "Glow"
+        else:
+            material = LOGO_METAL
+            depth = 0.00032
+            gap = 0.000075
+            prefix = "Metal"
+
+        obj = polygon_prism_xz(
+            f"Lid_Emblem_{prefix}_{index:02d}",
+            points,
+            surface_y + gap + depth / 2,
+            depth,
+            material,
+        )
+        obj["source_svg"] = os.path.relpath(svg_path, os.path.abspath("."))
+        obj["emblem_layer"] = material_key
+        parent_keep(obj, parent)
+        created.append(obj)
+
+    return created
 
 
 # ---------- dimensions ----------
@@ -696,6 +791,18 @@ for side, x in (("L", -HINGE_OUTER_X), ("R", HINGE_OUTER_X)):
 # Lid panel: local center above hinge
 lid = rounded_box("NOVA_Lid", (LID_W,LID_T,LID_H), (0,0,LID_H/2), 0.0075, GRAPHITE, 6)
 parent_keep(lid, lid_parent)
+
+# Reusable NOVA brand emblem on the outside/back of the display lid.
+# The SVG is the design source; the generator turns its polygon layers into
+# shallow physical metal/glow prisms that export with the canonical laptop.
+LID_EMBLEM_SVG = os.path.abspath("assets/brand/nova-emblem.svg")
+lid_emblem_parts = build_svg_lid_emblem(
+    LID_EMBLEM_SVG,
+    lid_parent,
+    surface_y=LID_T / 2,
+    center_z=LID_H * 0.56,
+    target_size=0.064,
+)
 
 # Inner bezel
 bezel = rounded_box("Display_Bezel", (LID_W-0.012,0.0018,LID_H-0.012), (0,-LID_T/2-0.0011,LID_H/2), 0.006, BLACK, 5)

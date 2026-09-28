@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">NOVA emblem</title>
+  <desc id="desc">Angular N monogram crossed by a four-point nova flare, derived from the approved metallic reference mark.</desc>
+
+  <!-- Dark-chrome N blades -->
+  <g id="nova-n" fill="#17202b">
+    <polygon data-material="metal" points="128,352 118,182 154,162 174,334"/>
+    <polygon data-material="metal" points="138,176 162,156 370,342 340,372"/>
+    <polygon data-material="metal" points="338,350 336,176 374,156 390,354 356,376"/>
+    <polygon data-material="metal" points="246,64 238,224 256,246 274,224 264,64"/>
+  </g>
+
+  <!-- Warm nova flare revealed around/through the monogram -->
+  <g id="nova-flare" fill="#ff7a35">
+    <polygon data-material="glow" points="256,42 247,226 256,246 265,226"/>
+    <polygon data-material="glow" points="256,266 247,286 256,470 265,286"/>
+    <polygon data-material="glow" points="42,256 226,247 246,256 226,265"/>
+    <polygon data-material="glow" points="266,256 286,247 470,256 286,265"/>
+    <polygon data-material="glow" points="244,244 256,237 268,244 275,256 268,268 256,275 244,268 237,256"/>
+  </g>
+</svg>
