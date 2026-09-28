@@ -671,6 +671,11 @@ for side, x in (("L", -HINGE_OUTER_X), ("R", HINGE_OUTER_X)):
 # Side I/O uses actual boolean apertures through the single unibody exterior
 # wall. Each connector gets port-specific interior geometry so macro views read
 # as real I/O instead of a row of anonymous black rectangles.
+def side_inset_x(side, inset):
+    """Return an X coordinate recessed inward from either chassis sidewall."""
+    return side * (W / 2 - inset)
+
+
 def side_port(name, side, y, depth, height, radius=0.0012, z=None):
     wall_x = side * (W / 2)
     zc = BASE_H * 0.44 if z is None else z
@@ -693,19 +698,23 @@ def side_port(name, side, y, depth, height, radius=0.0012, z=None):
     base_bottom.select_set(False)
     bpy.data.objects.remove(cutter, do_unlink=True)
 
+    # Never place decorative faces on the exterior chassis plane. The previous
+    # version used an oversized rim only ~0.03 mm from the shell, which caused
+    # WebGL depth-buffer fighting as the camera moved. Both layers now live
+    # fully inside the machined opening with clear depth separation.
     liner = rounded_box(
         name + "_Liner",
-        (0.00028, depth + 0.00065, height + 0.00065),
-        (side * (W / 2 + 0.00003), y, zc),
-        max(0.00038, radius * 0.72),
+        (0.00042, max(0.0018, depth - 0.00018), max(0.0016, height - 0.00018)),
+        (side_inset_x(side, 0.00115), y, zc),
+        max(0.00030, radius * 0.68),
         PORT_METAL,
         2
     )
     cavity = rounded_box(
         name,
-        (0.00022, depth - 0.00045, max(0.0014, height - 0.00045)),
-        (side * (W / 2 + 0.00010), y, zc),
-        max(0.00034, radius * 0.62),
+        (0.00030, max(0.0014, depth - 0.00085), max(0.0012, height - 0.00085)),
+        (side_inset_x(side, 0.00058), y, zc),
+        max(0.00024, radius * 0.52),
         PORT_INNER,
         2
     )
@@ -718,8 +727,8 @@ def usb_side_port(name, side, y, kind="A"):
         side_port(name, side, y, 0.0120, 0.00325, 0.00145, zc)
         tongue = rounded_box(
             name + "_Tongue",
-            (0.00034, 0.0068, 0.00062),
-            (side * (W / 2 + 0.00030), y, zc),
+            (0.00026, 0.0068, 0.00062),
+            (side_inset_x(side, 0.00030), y, zc),
             0.00028,
             PORT_TONGUE,
             2
@@ -728,8 +737,8 @@ def usb_side_port(name, side, y, kind="A"):
         side_port(name, side, y, 0.0158, 0.0049, 0.00092, zc)
         tongue = rounded_box(
             name + "_Tongue",
-            (0.00034, 0.0108, 0.00105),
-            (side * (W / 2 + 0.00030), y, zc - 0.00085),
+            (0.00026, 0.0108, 0.00105),
+            (side_inset_x(side, 0.00030), y, zc - 0.00085),
             0.00025,
             PORT_TONGUE,
             2
@@ -763,9 +772,9 @@ def round_side_port(name, side, y, radius, center_pin=False, z=None):
 
     bpy.ops.mesh.primitive_cylinder_add(
         vertices=40,
-        radius=radius + 0.00042,
-        depth=0.00028,
-        location=(side * (W / 2 + 0.00003), y, zc),
+        radius=max(0.0010, radius - 0.00012),
+        depth=0.00042,
+        location=(side_inset_x(side, 0.00115), y, zc),
         rotation=(0, math.pi / 2, 0)
     )
     liner = bpy.context.object
@@ -774,9 +783,9 @@ def round_side_port(name, side, y, radius, center_pin=False, z=None):
 
     bpy.ops.mesh.primitive_cylinder_add(
         vertices=40,
-        radius=max(0.0009, radius - 0.00025),
-        depth=0.00022,
-        location=(side * (W / 2 + 0.00012), y, zc),
+        radius=max(0.00072, radius - 0.00055),
+        depth=0.00030,
+        location=(side_inset_x(side, 0.00058), y, zc),
         rotation=(0, math.pi / 2, 0)
     )
     cavity = bpy.context.object
@@ -787,8 +796,8 @@ def round_side_port(name, side, y, radius, center_pin=False, z=None):
         bpy.ops.mesh.primitive_cylinder_add(
             vertices=24,
             radius=0.00055,
-            depth=0.00042,
-            location=(side * (W / 2 + 0.00028), y, zc),
+            depth=0.00020,
+            location=(side_inset_x(side, 0.00030), y, zc),
             rotation=(0, math.pi / 2, 0)
         )
         pin = bpy.context.object
@@ -806,8 +815,8 @@ def ethernet_side_port(name, side, y):
     # unmistakably RJ45 in side-profile/macro views.
     rounded_box(
         name + "_LatchRecess",
-        (0.00034, 0.0060, 0.00115),
-        (side * (W / 2 + 0.00030), y, zc - 0.00155),
+        (0.00024, 0.0060, 0.00115),
+        (side_inset_x(side, 0.00028), y, zc - 0.00155),
         0.00022,
         PORT_INNER,
         2
@@ -817,8 +826,8 @@ def ethernet_side_port(name, side, y):
         contact_y = y - contact_span / 2 + index * (contact_span / 7)
         rounded_box(
             f"{name}_Contact_{index+1:02d}",
-            (0.00030, 0.00052, 0.00048),
-            (side * (W / 2 + 0.00032), contact_y, zc + 0.00175),
+            (0.00020, 0.00052, 0.00048),
+            (side_inset_x(side, 0.00028), contact_y, zc + 0.00175),
             0.00012,
             COPPER,
             1
