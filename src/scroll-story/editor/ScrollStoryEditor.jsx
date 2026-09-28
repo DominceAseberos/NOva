@@ -969,19 +969,54 @@ export default function ScrollStoryEditor({ store, savePath = "src/story/nova-st
                 <span>Visible</span>
               </label>
 
-              <button
-                type="button"
-                onClick={() =>
-                  updatePartInspector({
-                    visible: true,
-                    position: [0, 0, 0],
-                    rotation: [0, 0, 0],
-                    scale: [1, 1, 1],
-                  })
-                }
-              >
-                Reset part
-              </button>
+              <div className="sse-part-callout-actions">
+                <button
+                  type="button"
+                  onClick={() =>
+                    updatePartInspector({
+                      position: [
+                        0.14,
+                        partInspector?.position?.[1] ?? 0,
+                        partInspector?.position?.[2] ?? 0,
+                      ],
+                    })
+                  }
+                >
+                  Move out +X
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    updatePartInspector({
+                      position: [
+                        -0.14,
+                        partInspector?.position?.[1] ?? 0,
+                        partInspector?.position?.[2] ?? 0,
+                      ],
+                    })
+                  }
+                >
+                  Move out -X
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    updatePartInspector({
+                      visible: true,
+                      position: [0, 0, 0],
+                      rotation: [0, 0, 0],
+                      scale: [1, 1, 1],
+                    })
+                  }
+                >
+                  Return to explode
+                </button>
+              </div>
+              <p className="sse-part-callout-hint">
+                Part transforms are relative to the exploded pose. Drag with W/E/R,
+                save the OUT key, return the part, then save the RETURN key before
+                moving the next component.
+              </p>
 
               <div className="sse-part-browser">
                 {editableParts.map((part) => {

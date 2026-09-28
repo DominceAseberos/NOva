@@ -791,6 +791,11 @@ export default function PersistentLaptop3D() {
 
     const applyFeatureCameraFocus = (state) => {
       if (!loadedScene || window.innerWidth < 820) return;
+      // Internal component callouts must stay spatially separated from the
+      // exploded laptop. Do not chase the moved component with the camera;
+      // the authored camera track holds the laptop while the selected part
+      // visibly peels away and returns.
+      if (FOCUS_PARTS_BY_CHAPTER[state?.chapter]) return;
       const config = FEATURE_CAMERA_FOCUS[state?.chapter];
       if (!config) return;
       const target = featureTargets.get(config.object);
@@ -993,7 +998,9 @@ export default function PersistentLaptop3D() {
         reducedMotion || state.explodeEnabled === false ? 0 : state.explode
       );
       applyPartOverrides(state.parts || {});
-      applyFocusPresentation(state.chapter);
+      // Component callout motion is authored explicitly in state.parts. The
+      // selected part therefore moves relative to the exploded baseline and
+      // can be positioned directly with the editor transform controls.
       setScreen(state.screen, 1, storyOpacity);
 
       hemi.intensity = state.ambient;
@@ -1103,7 +1110,6 @@ export default function PersistentLaptop3D() {
       setKeyboardLight(next.keyboardLight ?? 1);
       setExplode(next.explodeEnabled === false ? 0 : next.explode);
       applyPartOverrides(next.parts || {});
-      applyFocusPresentation(next.chapter);
       setScreen(next.screen, 1, next.opacity ?? 1);
     };
 
@@ -1461,7 +1467,6 @@ export default function PersistentLaptop3D() {
             }
           });
         });
-        applyFocusPresentation(state.chapter);
         applyFocusDimming(state.chapter, opacity);
 
         if (

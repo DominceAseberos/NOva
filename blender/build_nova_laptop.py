@@ -67,6 +67,7 @@ KEY_GLOW = mat("Keyboard Per-Key Glow", (0.0020,0.0025,0.0038), metallic=0.0, ro
 KEY_LEGEND = mat("Keyboard Legend Glow", (0.018,0.022,0.030), metallic=0.0, roughness=0.46, emission=(0.78,0.84,1.0), emission_strength=0.92)
 PORT_INNER = mat("Port Inner", (0.0008,0.0010,0.0015), metallic=0.0, roughness=0.82)
 PORT_METAL = mat("Port Metal", (0.055,0.065,0.078), metallic=0.78, roughness=0.34)
+PORT_TONGUE = mat("USB Port Tongue", (0.015,0.055,0.11), metallic=0.05, roughness=0.54)
 THERMAL_PAD = mat("Thermal Pad", (0.012,0.022,0.027), metallic=0.0, roughness=0.82)
 SILVER = mat("Machined Silver", (0.11,0.12,0.14), metallic=0.82, roughness=0.32)
 PCB_SILK = mat("PCB Silkscreen", (0.10,0.12,0.12), metallic=0.0, roughness=0.88)
@@ -668,14 +669,15 @@ for side, x in (("L", -HINGE_OUTER_X), ("R", HINGE_OUTER_X)):
     hinge_base_parts.append(pivot_cap)
 
 # Side I/O uses actual boolean apertures through the single unibody exterior
-# wall. The inset top-deck skin never reaches the sidewall, so it must not
-# participate in the port cut or create a second rim around the opening.
-def side_port(name, side, y, depth, height, radius=0.0012):
+# wall. Each connector gets port-specific interior geometry so macro views read
+# as real I/O instead of a row of anonymous black rectangles.
+def side_port(name, side, y, depth, height, radius=0.0012, z=None):
     wall_x = side * (W / 2)
+    zc = BASE_H * 0.44 if z is None else z
     cutter = rounded_box(
         name + "_BooleanCutter",
         (0.0070, depth, height),
-        (wall_x, y, BASE_H * 0.44),
+        (wall_x, y, zc),
         radius,
         None,
         3
@@ -689,16 +691,12 @@ def side_port(name, side, y, depth, height, radius=0.0012):
     mod.object = cutter
     bpy.ops.object.modifier_apply(modifier=mod.name)
     base_bottom.select_set(False)
-
     bpy.data.objects.remove(cutter, do_unlink=True)
 
-    # The rim/cavity faces sit almost flush with the machined wall so they
-    # remain legible in an oblique macro shot. Their thickness is sub-millimeter,
-    # preserving the recessed look instead of becoming attached chrome blocks.
     liner = rounded_box(
         name + "_Liner",
         (0.00028, depth + 0.00065, height + 0.00065),
-        (side * (W / 2 + 0.00003), y, BASE_H * 0.44),
+        (side * (W / 2 + 0.00003), y, zc),
         max(0.00038, radius * 0.72),
         PORT_METAL,
         2
@@ -706,22 +704,140 @@ def side_port(name, side, y, depth, height, radius=0.0012):
     cavity = rounded_box(
         name,
         (0.00022, depth - 0.00045, max(0.0014, height - 0.00045)),
-        (side * (W / 2 + 0.00010), y, BASE_H * 0.44),
+        (side * (W / 2 + 0.00010), y, zc),
         max(0.00034, radius * 0.62),
         PORT_INNER,
         2
     )
     return liner, cavity
 
-# Right side: two USB-C-class oval slots and one full-size USB-A-class slot.
-side_port("Port_USBC_R1", 1, -0.038, 0.0120, 0.0028, 0.00125)
-side_port("Port_USBC_R2", 1, -0.016, 0.0120, 0.0028, 0.00125)
-side_port("Port_USBA_R",  1,  0.050, 0.0180, 0.0046, 0.0010)
 
-# Left side: HDMI-class video slot, USB-A-class slot, and 3.5 mm audio opening.
-side_port("Port_HDMI_L", -1, -0.038, 0.0200, 0.0048, 0.0010)
-side_port("Port_USBA_L", -1,  0.012, 0.0180, 0.0046, 0.0010)
-side_port("Port_Audio_L", -1,  0.061, 0.0068, 0.0052, 0.0022)
+def usb_side_port(name, side, y, kind="A"):
+    zc = BASE_H * 0.44
+    if kind.upper() == "C":
+        side_port(name, side, y, 0.0120, 0.00325, 0.00145, zc)
+        tongue = rounded_box(
+            name + "_Tongue",
+            (0.00034, 0.0068, 0.00062),
+            (side * (W / 2 + 0.00030), y, zc),
+            0.00028,
+            PORT_TONGUE,
+            2
+        )
+    else:
+        side_port(name, side, y, 0.0158, 0.0049, 0.00092, zc)
+        tongue = rounded_box(
+            name + "_Tongue",
+            (0.00034, 0.0108, 0.00105),
+            (side * (W / 2 + 0.00030), y, zc - 0.00085),
+            0.00025,
+            PORT_TONGUE,
+            2
+        )
+    return tongue
+
+
+def round_side_port(name, side, y, radius, center_pin=False, z=None):
+    wall_x = side * (W / 2)
+    zc = BASE_H * 0.44 if z is None else z
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=40,
+        radius=radius,
+        depth=0.0070,
+        location=(wall_x, y, zc),
+        rotation=(0, math.pi / 2, 0)
+    )
+    cutter = bpy.context.object
+    cutter.name = name + "_BooleanCutter"
+
+    bpy.context.view_layer.objects.active = base_bottom
+    base_bottom.select_set(True)
+    mod = base_bottom.modifiers.new(name + "_Cut", 'BOOLEAN')
+    mod.operation = 'DIFFERENCE'
+    mod.solver = 'EXACT'
+    mod.object = cutter
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    base_bottom.select_set(False)
+    bpy.data.objects.remove(cutter, do_unlink=True)
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=40,
+        radius=radius + 0.00042,
+        depth=0.00028,
+        location=(side * (W / 2 + 0.00003), y, zc),
+        rotation=(0, math.pi / 2, 0)
+    )
+    liner = bpy.context.object
+    liner.name = name + "_Liner"
+    liner.data.materials.append(PORT_METAL)
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=40,
+        radius=max(0.0009, radius - 0.00025),
+        depth=0.00022,
+        location=(side * (W / 2 + 0.00012), y, zc),
+        rotation=(0, math.pi / 2, 0)
+    )
+    cavity = bpy.context.object
+    cavity.name = name
+    cavity.data.materials.append(PORT_INNER)
+
+    if center_pin:
+        bpy.ops.mesh.primitive_cylinder_add(
+            vertices=24,
+            radius=0.00055,
+            depth=0.00042,
+            location=(side * (W / 2 + 0.00028), y, zc),
+            rotation=(0, math.pi / 2, 0)
+        )
+        pin = bpy.context.object
+        pin.name = name + "_CenterPin"
+        pin.data.materials.append(PORT_METAL)
+
+    return liner, cavity
+
+
+def ethernet_side_port(name, side, y):
+    zc = BASE_H * 0.49
+    side_port(name, side, y, 0.0174, 0.0062, 0.00078, zc)
+
+    # A small latch recess plus copper contact fingers make the taller opening
+    # unmistakably RJ45 in side-profile/macro views.
+    rounded_box(
+        name + "_LatchRecess",
+        (0.00034, 0.0060, 0.00115),
+        (side * (W / 2 + 0.00030), y, zc - 0.00155),
+        0.00022,
+        PORT_INNER,
+        2
+    )
+    contact_span = 0.0105
+    for index in range(8):
+        contact_y = y - contact_span / 2 + index * (contact_span / 7)
+        rounded_box(
+            f"{name}_Contact_{index+1:02d}",
+            (0.00030, 0.00052, 0.00048),
+            (side * (W / 2 + 0.00032), contact_y, zc + 0.00175),
+            0.00012,
+            COPPER,
+            1
+        )
+
+
+# Left side, rear -> front: Ethernet, dedicated charging, USB-C, two USB-A,
+# then a 3.5 mm headset jack. The cluster is intentionally tight but keeps
+# enough shell between apertures to read as manufacturable.
+ethernet_side_port("Port_RJ45_L", -1, 0.068)
+round_side_port("Port_Charge_L", -1, 0.047, 0.0033, center_pin=True)
+usb_side_port("Port_USBC_L", -1, 0.029, "C")
+usb_side_port("Port_USBA_L1", -1, 0.007, "A")
+usb_side_port("Port_USBA_L2", -1, -0.014, "A")
+round_side_port("Port_Audio_L", -1, -0.032, 0.0022)
+
+# Right side: exactly two full-size USB-A ports, grouped closely as requested.
+usb_side_port("Port_USBA_R1", 1, 0.018, "A")
+usb_side_port("Port_USBA_R2", 1, -0.004, "A")
 
 # Rear exhaust assembly. Two concealed fin banks sit directly ahead of the
 # hinge line and read clearly in macro/rear shots without turning the exterior
@@ -877,9 +993,9 @@ focus_hinge = empty("Focus_Hinge", (0, HINGE_Y, HINGE_Z))
 parent_keep(focus_hinge, top_group)
 focus_edge = empty("Focus_Edge", (W/2, -0.030, BASE_H * 0.48))
 parent_keep(focus_edge, lower_group)
-focus_ports_r = empty("Focus_Ports_Right", (W/2, 0.000, BASE_H * 0.44))
+focus_ports_r = empty("Focus_Ports_Right", (W/2, 0.007, BASE_H * 0.44))
 parent_keep(focus_ports_r, lower_group)
-focus_ports_l = empty("Focus_Ports_Left", (-W/2, 0.000, BASE_H * 0.44))
+focus_ports_l = empty("Focus_Ports_Left", (-W/2, 0.018, BASE_H * 0.44))
 parent_keep(focus_ports_l, lower_group)
 focus_exhaust = empty("Focus_Exhaust", (0, EXHAUST_Y, BASE_H * 0.79))
 parent_keep(focus_exhaust, lower_group)
@@ -1828,10 +1944,10 @@ manifest = {
     "dimensions": {"width": W, "depth": D, "base_height": BASE_H, "lid_width": LID_W, "lid_height": LID_H, "lid_thickness": LID_T},
     "lid_lean_degrees": math.degrees(LEAN),
     "canonical_reference": "assets/hero/hero-laptop.png",
-    "visible_right_cutouts": 3,
+    "visible_right_cutouts": 2,
     "ports": {
-        "right": ["USB-C-class", "USB-C-class", "USB-A-class"],
-        "left": ["HDMI-class", "USB-A-class", "3.5mm-audio-class"]
+        "right": ["USB-A", "USB-A"],
+        "left": ["RJ45-Ethernet", "barrel-charging", "USB-C", "USB-A", "USB-A", "3.5mm-audio"]
     },
     "animatable_groups": ["LID_GROUP", "TOP_DECK_GROUP", "INTERNAL_GROUP", "LOWER_CHASSIS_GROUP"],
     "internal_components": ["Motherboard", "CPU_GPU_Package", "CPU_Package", "GPU_Package", "RAM_SODIMM_1", "RAM_SODIMM_2", "SSD_Module", "Fan_L", "Fan_R", "HeatPipe_1", "HeatPipe_2", "Heatsink_L", "Heatsink_R", "Battery_Cell_1", "Battery_Cell_2", "Battery_Cell_3", "Battery_Cell_4", "Internal_Midplate"],

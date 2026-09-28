@@ -318,7 +318,7 @@
       {
         "id": "perf-explode",
         "section": "performance",
-        "progress": 0.11,
+        "progress": 0.1,
         "chapter": "EXPLODE",
         "ease": "smooth",
         "state": {
@@ -345,8 +345,227 @@
       {
         "id": "perf-board",
         "section": "performance",
-        "progress": 0.22,
+        "progress": 0.18,
         "chapter": "MOTHERBOARD",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.61,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "motherboard": {
+              "visible": true,
+              "position": [
+                0.34,
+                0,
+                0.025
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.1,
+                1.1,
+                1.1
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-board-return",
+        "section": "performance",
+        "progress": 0.24,
+        "chapter": "MOTHERBOARD",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.61,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-gpu",
+        "section": "performance",
+        "progress": 0.29,
+        "chapter": "GPU",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.63,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "gpu": {
+              "visible": true,
+              "position": [
+                0.36,
+                0,
+                0.02
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                2.2,
+                2.2,
+                2.2
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-gpu-return",
+        "section": "performance",
+        "progress": 0.35,
+        "chapter": "GPU",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.63,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-cpu",
+        "section": "performance",
+        "progress": 0.4,
+        "chapter": "CPU",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.63,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {
+            "cpu": {
+              "visible": true,
+              "position": [
+                0.36,
+                0,
+                0.018
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                2.2,
+                2.2,
+                2.2
+              ]
+            }
+          },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-cpu-return",
+        "section": "performance",
+        "progress": 0.46,
+        "chapter": "CPU",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.63,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-memory",
+        "section": "performance",
+        "progress": 0.51,
+        "chapter": "MEMORY",
         "ease": "smooth",
         "state": {
           "x": 0.88,
@@ -361,12 +580,12 @@
           "explodeEnabled": true,
           "explode": 1,
           "parts": {
-            "motherboard": {
+            "ram1": {
               "visible": true,
               "position": [
+                0.34,
                 0,
-                0,
-                0
+                0.03
               ],
               "rotation": [
                 0,
@@ -374,9 +593,27 @@
                 0
               ],
               "scale": [
-                1.32,
-                1.32,
-                1.32
+                1.45,
+                1.45,
+                1.45
+              ]
+            },
+            "ram2": {
+              "visible": true,
+              "position": [
+                0.34,
+                0,
+                0.03
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1.45,
+                1.45,
+                1.45
               ]
             }
           },
@@ -389,101 +626,9 @@
         }
       },
       {
-        "id": "perf-gpu",
+        "id": "perf-memory-return",
         "section": "performance",
-        "progress": 0.34,
-        "chapter": "GPU",
-        "ease": "smooth",
-        "state": {
-          "x": 0.88,
-          "y": -0.04,
-          "z": 0,
-          "rx": 2.7085,
-          "ry": -0.93827,
-          "rz": 2.80746,
-          "scale": 0.67,
-          "lid": 1,
-          "keyboardLight": 0.25,
-          "explodeEnabled": true,
-          "explode": 1,
-          "parts": {
-            "gpu": {
-              "visible": true,
-              "position": [
-                0,
-                0,
-                0
-              ],
-              "rotation": [
-                0,
-                0,
-                0
-              ],
-              "scale": [
-                4,
-                4,
-                4
-              ]
-            }
-          },
-          "screen": 0,
-          "cool": 3,
-          "warm": 0.65,
-          "ambient": 1.08,
-          "shadow": 0.32,
-          "opacity": 1
-        }
-      },
-      {
-        "id": "perf-cpu",
-        "section": "performance",
-        "progress": 0.45,
-        "chapter": "CPU",
-        "ease": "smooth",
-        "state": {
-          "x": 0.88,
-          "y": -0.04,
-          "z": 0,
-          "rx": 2.7085,
-          "ry": -0.93827,
-          "rz": 2.80746,
-          "scale": 0.67,
-          "lid": 1,
-          "keyboardLight": 0.25,
-          "explodeEnabled": true,
-          "explode": 1,
-          "parts": {
-            "cpu": {
-              "visible": true,
-              "position": [
-                0,
-                0,
-                0
-              ],
-              "rotation": [
-                0,
-                0,
-                0
-              ],
-              "scale": [
-                4,
-                4,
-                4
-              ]
-            }
-          },
-          "screen": 0,
-          "cool": 3,
-          "warm": 0.65,
-          "ambient": 1.08,
-          "shadow": 0.32,
-          "opacity": 1
-        }
-      },
-      {
-        "id": "perf-memory",
-        "section": "performance",
-        "progress": 0.56,
+        "progress": 0.57,
         "chapter": "MEMORY",
         "ease": "smooth",
         "state": {
@@ -493,49 +638,12 @@
           "rx": 2.7085,
           "ry": -0.93827,
           "rz": 2.80746,
-          "scale": 0.64,
+          "scale": 0.62,
           "lid": 1,
           "keyboardLight": 0.25,
           "explodeEnabled": true,
           "explode": 1,
-          "parts": {
-            "ram1": {
-              "visible": true,
-              "position": [
-                0,
-                0,
-                0
-              ],
-              "rotation": [
-                0,
-                0,
-                0
-              ],
-              "scale": [
-                2.25,
-                2.25,
-                2.25
-              ]
-            },
-            "ram2": {
-              "visible": true,
-              "position": [
-                0,
-                0,
-                0
-              ],
-              "rotation": [
-                0,
-                0,
-                0
-              ],
-              "scale": [
-                2.25,
-                2.25,
-                2.25
-              ]
-            }
-          },
+          "parts": {},
           "screen": 0,
           "cool": 3,
           "warm": 0.65,
@@ -547,7 +655,7 @@
       {
         "id": "perf-storage",
         "section": "performance",
-        "progress": 0.66,
+        "progress": 0.62,
         "chapter": "STORAGE",
         "ease": "smooth",
         "state": {
@@ -557,7 +665,7 @@
           "rx": 2.7085,
           "ry": -0.93827,
           "rz": 2.80746,
-          "scale": 0.66,
+          "scale": 0.63,
           "lid": 1,
           "keyboardLight": 0.25,
           "explodeEnabled": true,
@@ -566,9 +674,9 @@
             "ssd": {
               "visible": true,
               "position": [
+                0.34,
                 0,
-                0,
-                -0.06
+                0.03
               ],
               "rotation": [
                 0,
@@ -576,12 +684,39 @@
                 0
               ],
               "scale": [
-                3.8,
-                3.8,
-                3.8
+                2,
+                2,
+                2
               ]
             }
           },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-storage-return",
+        "section": "performance",
+        "progress": 0.68,
+        "chapter": "STORAGE",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.63,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
           "screen": 0,
           "cool": 3,
           "warm": 0.65,
@@ -593,7 +728,7 @@
       {
         "id": "perf-cooling",
         "section": "performance",
-        "progress": 0.77,
+        "progress": 0.73,
         "chapter": "COOLING",
         "ease": "smooth",
         "state": {
@@ -603,7 +738,7 @@
           "rx": 2.7085,
           "ry": -0.93827,
           "rz": 2.80746,
-          "scale": 0.61,
+          "scale": 0.6,
           "lid": 1,
           "keyboardLight": 0.25,
           "explodeEnabled": true,
@@ -612,9 +747,9 @@
             "fanLeft": {
               "visible": true,
               "position": [
+                0.3,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -622,17 +757,17 @@
                 0
               ],
               "scale": [
-                1.3,
-                1.3,
-                1.3
+                1.08,
+                1.08,
+                1.08
               ]
             },
             "fanRight": {
               "visible": true,
               "position": [
+                0.3,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -640,17 +775,17 @@
                 0
               ],
               "scale": [
-                1.3,
-                1.3,
-                1.3
+                1.08,
+                1.08,
+                1.08
               ]
             },
             "heatPipe1": {
               "visible": true,
               "position": [
+                0.3,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -658,17 +793,17 @@
                 0
               ],
               "scale": [
-                1.2,
-                1.2,
-                1.2
+                1.05,
+                1.05,
+                1.05
               ]
             },
             "heatPipe2": {
               "visible": true,
               "position": [
+                0.3,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -676,17 +811,17 @@
                 0
               ],
               "scale": [
-                1.2,
-                1.2,
-                1.2
+                1.05,
+                1.05,
+                1.05
               ]
             },
             "heatsinkLeft": {
               "visible": true,
               "position": [
+                0.3,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -694,17 +829,17 @@
                 0
               ],
               "scale": [
-                1.24,
-                1.24,
-                1.24
+                1.06,
+                1.06,
+                1.06
               ]
             },
             "heatsinkRight": {
               "visible": true,
               "position": [
+                0.3,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -712,9 +847,9 @@
                 0
               ],
               "scale": [
-                1.24,
-                1.24,
-                1.24
+                1.06,
+                1.06,
+                1.06
               ]
             }
           },
@@ -727,9 +862,36 @@
         }
       },
       {
+        "id": "perf-cooling-return",
+        "section": "performance",
+        "progress": 0.79,
+        "chapter": "COOLING",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.6,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
         "id": "perf-battery",
         "section": "performance",
-        "progress": 0.87,
+        "progress": 0.84,
         "chapter": "BATTERY",
         "ease": "smooth",
         "state": {
@@ -739,7 +901,7 @@
           "rx": 2.7085,
           "ry": -0.93827,
           "rz": 2.80746,
-          "scale": 0.61,
+          "scale": 0.6,
           "lid": 1,
           "keyboardLight": 0.25,
           "explodeEnabled": true,
@@ -748,9 +910,9 @@
             "battery1": {
               "visible": true,
               "position": [
+                0.28,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -758,17 +920,17 @@
                 0
               ],
               "scale": [
-                1.2,
-                1.2,
-                1.2
+                1.05,
+                1.05,
+                1.05
               ]
             },
             "battery2": {
               "visible": true,
               "position": [
+                0.28,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -776,17 +938,17 @@
                 0
               ],
               "scale": [
-                1.2,
-                1.2,
-                1.2
+                1.05,
+                1.05,
+                1.05
               ]
             },
             "battery3": {
               "visible": true,
               "position": [
+                0.28,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -794,17 +956,17 @@
                 0
               ],
               "scale": [
-                1.2,
-                1.2,
-                1.2
+                1.05,
+                1.05,
+                1.05
               ]
             },
             "battery4": {
               "visible": true,
               "position": [
+                0.28,
                 0,
-                0,
-                0
+                0.025
               ],
               "rotation": [
                 0,
@@ -812,12 +974,39 @@
                 0
               ],
               "scale": [
-                1.2,
-                1.2,
-                1.2
+                1.05,
+                1.05,
+                1.05
               ]
             }
           },
+          "screen": 0,
+          "cool": 3,
+          "warm": 0.65,
+          "ambient": 1.08,
+          "shadow": 0.32,
+          "opacity": 1
+        }
+      },
+      {
+        "id": "perf-battery-return",
+        "section": "performance",
+        "progress": 0.9,
+        "chapter": "BATTERY",
+        "ease": "smooth",
+        "state": {
+          "x": 0.88,
+          "y": -0.04,
+          "z": 0,
+          "rx": 2.7085,
+          "ry": -0.93827,
+          "rz": 2.80746,
+          "scale": 0.6,
+          "lid": 1,
+          "keyboardLight": 0.25,
+          "explodeEnabled": true,
+          "explode": 1,
+          "parts": {},
           "screen": 0,
           "cool": 3,
           "warm": 0.65,
@@ -1355,7 +1544,7 @@
       {
         "id": "cam-board",
         "section": "performance",
-        "progress": 0.22,
+        "progress": 0.18,
         "ease": "smooth",
         "state": {
           "position": [
@@ -1374,7 +1563,7 @@
       {
         "id": "cam-gpu",
         "section": "performance",
-        "progress": 0.34,
+        "progress": 0.29,
         "ease": "smooth",
         "state": {
           "position": [
@@ -1393,7 +1582,7 @@
       {
         "id": "cam-cpu",
         "section": "performance",
-        "progress": 0.45,
+        "progress": 0.4,
         "ease": "smooth",
         "state": {
           "position": [
@@ -1412,7 +1601,7 @@
       {
         "id": "cam-memory",
         "section": "performance",
-        "progress": 0.56,
+        "progress": 0.51,
         "ease": "smooth",
         "state": {
           "position": [
@@ -1431,7 +1620,7 @@
       {
         "id": "cam-storage",
         "section": "performance",
-        "progress": 0.66,
+        "progress": 0.62,
         "ease": "smooth",
         "state": {
           "position": [
@@ -1450,7 +1639,7 @@
       {
         "id": "cam-cooling",
         "section": "performance",
-        "progress": 0.77,
+        "progress": 0.73,
         "ease": "smooth",
         "state": {
           "position": [
@@ -1469,7 +1658,7 @@
       {
         "id": "cam-battery",
         "section": "performance",
-        "progress": 0.87,
+        "progress": 0.84,
         "ease": "smooth",
         "state": {
           "position": [

@@ -68,29 +68,56 @@ const internalBase = S({
 
 const performance = [
   K("perf-intro","performance",0.02,"PERFORMANCE",S({x:.76,y:.03,z:.18,rx:.34,ry:.02,rz:-.01,scale:.82,lid:1,keyboardLight:1,explode:0})),
-  K("perf-explode","performance",0.11,"EXPLODE",internalBase),
-  K("perf-board","performance",0.22,"MOTHERBOARD",S({...internalBase,scale:.62,parts:{motherboard:P(true,[0,0,0],[1.32,1.32,1.32])}})),
-  K("perf-gpu","performance",0.34,"GPU",S({...internalBase,scale:.67,parts:{gpu:P(true,[0,0,0],[4.0,4.0,4.0])}})),
-  K("perf-cpu","performance",0.45,"CPU",S({...internalBase,scale:.67,parts:{cpu:P(true,[0,0,0],[4.0,4.0,4.0])}})),
-  K("perf-memory","performance",0.56,"MEMORY",S({...internalBase,scale:.64,parts:{
-    ram1:P(true,[0,0,0],[2.25,2.25,2.25]),
-    ram2:P(true,[0,0,0],[2.25,2.25,2.25])
+  K("perf-explode","performance",0.10,"EXPLODE",internalBase),
+
+  // Each component spotlight is authored as an explicit OUT pose followed by
+  // a RETURN pose. Part transforms are relative to the exploded baseline, so
+  // the editor can freely drag/rotate/scale any OUT key without disturbing
+  // the shared exploded laptop.
+  K("perf-board","performance",0.18,"MOTHERBOARD",S({...internalBase,scale:.61,parts:{
+    motherboard:P(true,[.34,0,.025],[1.10,1.10,1.10])
   }})),
-  K("perf-storage","performance",0.66,"STORAGE",S({...internalBase,scale:.66,parts:{ssd:P(true,[0,0,-0.060],[3.8,3.8,3.8])}})),
-  K("perf-cooling","performance",0.77,"COOLING",S({...internalBase,scale:.61,parts:{
-    fanLeft:P(true,[0,0,0],[1.30,1.30,1.30]),
-    fanRight:P(true,[0,0,0],[1.30,1.30,1.30]),
-    heatPipe1:P(true,[0,0,0],[1.20,1.20,1.20]),
-    heatPipe2:P(true,[0,0,0],[1.20,1.20,1.20]),
-    heatsinkLeft:P(true,[0,0,0],[1.24,1.24,1.24]),
-    heatsinkRight:P(true,[0,0,0],[1.24,1.24,1.24])
+  K("perf-board-return","performance",0.24,"MOTHERBOARD",S({...internalBase,scale:.61,parts:{}})),
+
+  K("perf-gpu","performance",0.29,"GPU",S({...internalBase,scale:.63,parts:{
+    gpu:P(true,[.36,0,.020],[2.20,2.20,2.20])
   }})),
-  K("perf-battery","performance",0.87,"BATTERY",S({...internalBase,scale:.61,parts:{
-    battery1:P(true,[0,0,0],[1.20,1.20,1.20]),
-    battery2:P(true,[0,0,0],[1.20,1.20,1.20]),
-    battery3:P(true,[0,0,0],[1.20,1.20,1.20]),
-    battery4:P(true,[0,0,0],[1.20,1.20,1.20])
+  K("perf-gpu-return","performance",0.35,"GPU",S({...internalBase,scale:.63,parts:{}})),
+
+  K("perf-cpu","performance",0.40,"CPU",S({...internalBase,scale:.63,parts:{
+    cpu:P(true,[.36,0,.018],[2.20,2.20,2.20])
   }})),
+  K("perf-cpu-return","performance",0.46,"CPU",S({...internalBase,scale:.63,parts:{}})),
+
+  K("perf-memory","performance",0.51,"MEMORY",S({...internalBase,scale:.62,parts:{
+    ram1:P(true,[.34,0,.030],[1.45,1.45,1.45]),
+    ram2:P(true,[.34,0,.030],[1.45,1.45,1.45])
+  }})),
+  K("perf-memory-return","performance",0.57,"MEMORY",S({...internalBase,scale:.62,parts:{}})),
+
+  K("perf-storage","performance",0.62,"STORAGE",S({...internalBase,scale:.63,parts:{
+    ssd:P(true,[.34,0,.030],[2.00,2.00,2.00])
+  }})),
+  K("perf-storage-return","performance",0.68,"STORAGE",S({...internalBase,scale:.63,parts:{}})),
+
+  K("perf-cooling","performance",0.73,"COOLING",S({...internalBase,scale:.60,parts:{
+    fanLeft:P(true,[.30,0,.025],[1.08,1.08,1.08]),
+    fanRight:P(true,[.30,0,.025],[1.08,1.08,1.08]),
+    heatPipe1:P(true,[.30,0,.025],[1.05,1.05,1.05]),
+    heatPipe2:P(true,[.30,0,.025],[1.05,1.05,1.05]),
+    heatsinkLeft:P(true,[.30,0,.025],[1.06,1.06,1.06]),
+    heatsinkRight:P(true,[.30,0,.025],[1.06,1.06,1.06])
+  }})),
+  K("perf-cooling-return","performance",0.79,"COOLING",S({...internalBase,scale:.60,parts:{}})),
+
+  K("perf-battery","performance",0.84,"BATTERY",S({...internalBase,scale:.60,parts:{
+    battery1:P(true,[.28,0,.025],[1.05,1.05,1.05]),
+    battery2:P(true,[.28,0,.025],[1.05,1.05,1.05]),
+    battery3:P(true,[.28,0,.025],[1.05,1.05,1.05]),
+    battery4:P(true,[.28,0,.025],[1.05,1.05,1.05])
+  }})),
+  K("perf-battery-return","performance",0.90,"BATTERY",S({...internalBase,scale:.60,parts:{}})),
+
   K("perf-reassemble","performance",0.98,"REASSEMBLE",S({x:.83,y:.03,z:0,rx:.24,ry:-.28,rz:-.04,scale:.76,lid:1,keyboardLight:1,explode:0}))
 ];
 
@@ -132,13 +159,13 @@ const C = (id, section, progress, position, target, fov = 36) => ({
 story.tracks.camera = [
   C("cam-hero","top",0,[0,1.18,4.45],[0,-.08,0],36),
   C("cam-perf","performance",0.02,[0,1.12,4.25],[0,-.06,0],34),
-  C("cam-board","performance",0.22,[0.02,1.00,3.82],[.18,-.02,0],27),
-  C("cam-gpu","performance",0.34,[0.02,.98,3.68],[.20,-.02,0],25),
-  C("cam-cpu","performance",0.45,[0.02,.98,3.68],[.20,-.02,0],25),
-  C("cam-memory","performance",0.56,[0.02,1.00,3.78],[.20,-.02,0],26),
-  C("cam-storage","performance",0.66,[0.02,.96,3.58],[.22,-.02,0],24),
-  C("cam-cooling","performance",0.77,[0.02,1.00,3.78],[.20,-.02,0],26),
-  C("cam-battery","performance",0.87,[0.02,1.00,3.82],[.20,-.04,0],27),
+  C("cam-board","performance",0.18,[0.02,1.00,3.82],[.18,-.02,0],27),
+  C("cam-gpu","performance",0.29,[0.02,.98,3.68],[.20,-.02,0],25),
+  C("cam-cpu","performance",0.40,[0.02,.98,3.68],[.20,-.02,0],25),
+  C("cam-memory","performance",0.51,[0.02,1.00,3.78],[.20,-.02,0],26),
+  C("cam-storage","performance",0.62,[0.02,.96,3.58],[.22,-.02,0],24),
+  C("cam-cooling","performance",0.73,[0.02,1.00,3.78],[.20,-.02,0],26),
+  C("cam-battery","performance",0.84,[0.02,1.00,3.82],[.20,-.04,0],27),
   C("cam-perf-end","performance",0.96,[0,1.12,4.3],[0,-.06,0],34),
   C("cam-display","display",0.02,[0,1.12,4.2],[0,-.07,0],33),
   C("cam-screen-thin","display",0.24,[0,.98,3.70],[.20,-.01,0],25),

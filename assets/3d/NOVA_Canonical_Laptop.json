@@ -11,17 +11,19 @@
   },
   "lid_lean_degrees": -14.999999999999998,
   "canonical_reference": "assets/hero/hero-laptop.png",
-  "visible_right_cutouts": 3,
+  "visible_right_cutouts": 2,
   "ports": {
     "right": [
-      "USB-C-class",
-      "USB-C-class",
-      "USB-A-class"
+      "USB-A",
+      "USB-A"
     ],
     "left": [
-      "HDMI-class",
-      "USB-A-class",
-      "3.5mm-audio-class"
+      "RJ45-Ethernet",
+      "barrel-charging",
+      "USB-C",
+      "USB-A",
+      "USB-A",
+      "3.5mm-audio"
     ]
   },
   "animatable_groups": [
