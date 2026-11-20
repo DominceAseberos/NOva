@@ -48,14 +48,15 @@ try {
         if (s.id === secId) break;
         startTime += Number(s.duration) || 0;
       }
-      const dur = Number(sectionObj?.duration || 100);
+      const targetSec = storyObj.sections.find((s) => s.id === secId);
+      const dur = Number(targetSec?.duration || 100);
 
       api.scrollToTime(startTime);
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 600));
       const p1 = depthHook ? depthHook.sample() : null;
 
-      api.scrollToTime(startTime + 60);
-      await new Promise((r) => setTimeout(r, 400));
+      api.scrollToTime(startTime + Math.min(60, dur * 0.4));
+      await new Promise((r) => setTimeout(r, 600));
       const p2 = depthHook ? depthHook.sample() : null;
 
       return { p1, p2, hasHook: Boolean(depthHook) };
