@@ -4,12 +4,18 @@ description: >-
   Project-specific Creative & Technical Direction skill for the NOVA Persistent 3D
   Laptop Scroll Story. Governs Blender 5.2 high-detail asset generation, Three.js
   luxury studio HDRI PBR rendering, gimbal-free scroll choreography, exploded
-  hardware visibility, layered scenic parallax, and mandatory live WebGL screenshot QA.
+  hardware visibility, layered scenic parallax (nova-parallax-depth standard),
+  and mandatory AI-in-the-loop vision critic audits (ui-vision-critic standard).
 ---
 
 # NOVA 3D Luxury Product Direction & Engineering Skill
 
 Use this skill whenever designing, modeling, lighting, choreographing, or visually auditing the NOVA 3D landing page (`c:\Users\user\OneDrive\Desktop\Projects\NOva`).
+
+> [!NOTE]
+> This skill operates in tandem with:
+> - **nova-parallax-depth**: Multi-plane WebGL depth (L0–L5) and optical speed invariants.
+> - **ui-vision-critic**: Adversarial 9-point layout criticism and screenshot measurement.
 
 ---
 
