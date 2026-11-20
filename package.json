@@ -16,7 +16,9 @@
     "qa:performance": "node scripts/qa-performance.mjs",
     "qa:lenis": "node scripts/qa-lenis.mjs",
     "qa:story": "node scripts/qa-story-timeline.mjs",
-    "qa:all": "npm test && npm run qa:layout && npm run qa:motion && npm run qa:story",
+    "qa:parallax": "node scripts/qa-parallax.mjs",
+    "qa:vision": "node scripts/qa-vision-capture.mjs",
+    "qa:all": "npm test && npm run qa:layout && npm run qa:motion && npm run qa:story && npm run qa:parallax",
     "qa:editor": "node scripts/qa-scroll-story-editor-workflow.mjs && node scripts/qa-editor-advanced.mjs && node scripts/qa-editor-inspector-sync.mjs && node scripts/qa-autokey-timeline.mjs && node scripts/qa-autokey-gizmo-signal.mjs && node scripts/qa-editor-layer-isolation.mjs && node scripts/qa-video-editor-timeline.mjs && node scripts/qa-pin-boundary.mjs && node scripts/qa-pin-capture-live.mjs && node scripts/qa-parts-editor.mjs && node scripts/qa-explode-toggle.mjs"
   },
   "keywords": [],
