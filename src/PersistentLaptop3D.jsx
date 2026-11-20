@@ -17,6 +17,7 @@ import {
 } from "./scroll-story/runtime/editorBridge.js";
 import { getActiveLenis } from "./scroll-story/runtime/lenisBridge.js";
 import { isStoryEditorMode, novaStoryStore } from "./story/novaStoryStore.js";
+import { DepthStage } from "./world/DepthStage.js";
 
 import novaModelUrl from "../assets/3d/NOVA_Canonical_Laptop.glb?url";
 import screenDisplayUrl from "../assets/3d/textures/web/screen-display.webp?url";
@@ -178,13 +179,10 @@ export default function PersistentLaptop3D() {
       return homeParent;
     };
 
-    const attachToSection = (sectionId, chapter) => {
-      // Authoring mode must keep the WebGL viewport outside section stacking
-      // contexts so the real 3D object is always the topmost page-content layer.
-      const host = editorMode
-        ? homeParent
-        : hostForSection(sectionId) || hostForChapter(chapter);
-
+    const attachToSection = () => {
+      // Keep the persistent WebGL depth viewport unified on the root shell
+      // so multi-plane parallax and depth planes remain uninterrupted across all chapters.
+      const host = homeParent;
       if (host && shell.parentElement !== host) {
         host.appendChild(shell);
       }
@@ -268,6 +266,9 @@ export default function PersistentLaptop3D() {
     const modelRoot = new THREE.Group();
     storyRoot.add(modelRoot);
     scene.add(storyRoot);
+
+    scene.fog = new THREE.FogExp2(0x090e15, 0.022);
+    const depthStage = new DepthStage(scene, camera, renderer);
 
     let transformAdapter = null;
     let selectedPartId = null;
@@ -618,10 +619,10 @@ export default function PersistentLaptop3D() {
       m.envMapIntensity = 1.45;
 
       if (m.name === "NOVA Graphite") {
-        m.color.setRGB(0.11, 0.122, 0.142);
-        m.metalness = 0.84;
-        m.roughness = 0.27;
-        m.envMapIntensity = 1.75;
+        m.color.setRGB(0.024, 0.026, 0.030);
+        m.metalness = 0.88;
+        m.roughness = 0.28;
+        m.envMapIntensity = 1.35;
       } else if (m.name === "NOVA Dark Edge") {
         m.color.setRGB(0.055, 0.062, 0.075);
         m.metalness = 0.72;
@@ -1860,6 +1861,9 @@ export default function PersistentLaptop3D() {
         setScreen(state.screen, dt, storyOpacity);
         applyFeatureCameraFocus(state);
 
+        depthStage.setWorld(state.section || "top");
+        depthStage.update(dt, camera, state, { key, rim, fill, hemi });
+
         const lightDamp = 1 - Math.exp(-4.5 * dt);
         hemi.intensity = THREE.MathUtils.lerp(
           hemi.intensity,
@@ -1992,6 +1996,7 @@ export default function PersistentLaptop3D() {
         });
       }
       screenTextures.forEach((t) => t?.dispose?.());
+      depthStage.dispose();
       envRT.dispose();
       shadowTexture.dispose();
       shadowGeo.dispose();
@@ -2007,10 +2012,6 @@ export default function PersistentLaptop3D() {
       aria-hidden="true"
     >
       <canvas className="persistent-product-canvas" ref={canvasRef} />
-      <div className="persistent-product-hud">
-        <span>{chapter}</span>
-        <i />
-      </div>
     </div>
   );
 }

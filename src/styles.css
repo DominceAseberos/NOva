@@ -1646,10 +1646,13 @@ a:focus-visible .arrow {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: translateY(16px);
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(18px);
   transition:
-    opacity 360ms ease,
-    transform 520ms cubic-bezier(.2,.8,.2,1);
+    opacity 320ms cubic-bezier(.16,1,.3,1),
+    transform 460ms cubic-bezier(.16,1,.3,1),
+    visibility 320ms;
 }
 
 .story-panel__copy {
@@ -1819,7 +1822,21 @@ body[data-story-chapter="FINAL"] [data-story-panel="FINAL"],
 body[data-story-chapter="CLOSE"] [data-story-panel="CLOSE"],
 body[data-story-chapter="NOVA"] [data-story-panel="NOVA"] {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateY(0);
+}
+
+/* When 3D DepthStage is ready, smoothly cross-fade from static fallback */
+.nova-persistent-3d-ready .scene-bg {
+  opacity: 0;
+  transition: opacity 800ms ease;
+  pointer-events: none;
+}
+
+.nova-persistent-3d-ready .product-film-bg {
+  opacity: 0.15;
+  transition: opacity 800ms ease;
 }
 
 .scene--performance,
