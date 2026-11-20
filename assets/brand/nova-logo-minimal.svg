@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%" role="img" aria-label="NOVA emblem">
+  <defs>
+    <!-- Platinum Satin Specular -->
+    <linearGradient id="nova-specular" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E2E8F0" />
+    </linearGradient>
+    <!-- Machined Titanium Midtone -->
+    <linearGradient id="nova-titanium" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#64748B" />
+    </linearGradient>
+    <!-- Deep Anodized Shadow Bevel -->
+    <linearGradient id="nova-shadow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <!-- Celestial Energy Core -->
+    <radialGradient id="nova-core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="55%" stop-color="#BAE6FD" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <g id="nova-stellar-prism">
+    <!-- North Blade: Left (Specular), Right (Titanium Mid) -->
+    <polygon points="32,4 27,27 32,29.5" fill="url(#nova-specular)" />
+    <polygon points="32,4 32,29.5 37,27" fill="url(#nova-titanium)" />
+
+    <!-- East Blade: Top (Specular), Bottom (Shadow) -->
+    <polygon points="60,32 34.5,32 37,27" fill="url(#nova-specular)" />
+    <polygon points="60,32 37,37 34.5,32" fill="url(#nova-shadow)" />
+
+    <!-- South Blade: Right (Mid), Left (Shadow) -->
+    <polygon points="32,60 37,37 32,34.5" fill="url(#nova-titanium)" />
+    <polygon points="32,60 32,34.5 27,37" fill="url(#nova-shadow)" />
+
+    <!-- West Blade: Bottom (Mid), Top (Specular) -->
+    <polygon points="4,32 29.5,32 27,37" fill="url(#nova-titanium)" />
+    <polygon points="4,32 27,27 29.5,32" fill="url(#nova-specular)" />
+
+    <!-- 4 Diagonal Auxiliary Flares (Precision Diamond Chamfers) -->
+    <polygon points="32,27 41,23 37,32 34,29" fill="url(#nova-specular)" opacity="0.95" />
+    <polygon points="37,32 41,41 32,37 34,35" fill="url(#nova-shadow)" opacity="0.9" />
+    <polygon points="32,37 23,41 27,32 30,35" fill="url(#nova-shadow)" opacity="0.9" />
+    <polygon points="27,32 23,23 32,27 30,29" fill="url(#nova-specular)" opacity="0.95" />
+
+    <!-- Central Precision Floating Core -->
+    <circle cx="32" cy="32" r="3.5" fill="url(#nova-core-glow)" />
+    <polygon points="32,28.8 35.2,32 32,35.2 28.8,32" fill="#FFFFFF" />
+  </g>
+</svg>

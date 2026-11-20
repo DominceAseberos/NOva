@@ -2,7 +2,9 @@ export const clamp01 = (value) => Math.max(0, Math.min(1, value));
 
 export const smoothstep = (value) => {
   const t = clamp01(value);
-  return t * t * (3 - 2 * t);
+  // Quintic smootherstep (C2 continuous: zero velocity AND zero acceleration
+  // at both endpoints for cinema-grade weighted scroll choreography).
+  return t * t * t * (t * (t * 6 - 15) + 10);
 };
 
 export const linear = (value) => clamp01(value);
@@ -254,9 +256,42 @@ export function evaluateProductTrack(story, time) {
     }
   }
 
-  // Do not begin interpolating toward another section early. Once the last
-  // key in this section is reached, hold it until this section's pin ends.
+  // When scrolling past a section's final keyframe (the inter-section unpin
+  // handoff window, e.g. progress 0.90 -> 1.00), smoothly transition into the
+  // next section's opening keyframe so the 3D laptop is already in the new
+  // section's macro pose as the new section scrolls up into the viewport.
   const lastLocal = local[local.length - 1];
+  const lastTime = keyframeTime(story, lastLocal);
+  const nextSectionFirst = keyframes.find(
+    (keyframe) =>
+      keyframe.section !== sectionId &&
+      keyframeTime(story, keyframe) >= (currentSection?.end ?? Infinity) - 1e-6
+  );
+
+  if (
+    nextSectionFirst &&
+    currentSection &&
+    safeTime > lastTime + 1e-6 &&
+    currentSection.end > lastTime + 1e-6
+  ) {
+    const handoffSpan = Math.max(1e-6, currentSection.end - lastTime);
+    // Complete the 3D rotation by 78% of the inter-section scroll so the pose
+    // is already settled when the incoming section's headline enters view.
+    const raw = clamp01((safeTime - lastTime) / (handoffSpan * 0.78));
+    const mid = (safeTime - lastTime) / handoffSpan >= 0.45;
+    return {
+      ...interpolateProductState(
+        lastLocal.state,
+        nextSectionFirst.state,
+        raw,
+        nextSectionFirst.ease
+      ),
+      chapter: mid ? nextSectionFirst.chapter : lastLocal.chapter,
+      section: mid ? nextSectionFirst.section : sectionId,
+      keyframeId: mid ? nextSectionFirst.id : lastLocal.id,
+    };
+  }
+
   return {
     ...withProductDefaults(lastLocal.state),
     chapter: lastLocal.chapter,
@@ -394,6 +429,34 @@ export function evaluateCameraTrack(story, time) {
   }
 
   const lastLocal = local[local.length - 1];
+  const lastTime = keyframeTime(story, lastLocal);
+  const nextSectionFirst = keyframes.find(
+    (keyframe) =>
+      keyframe.section !== sectionId &&
+      keyframeTime(story, keyframe) >= (currentSection?.end ?? Infinity) - 1e-6
+  );
+
+  if (
+    nextSectionFirst &&
+    currentSection &&
+    safeTime > lastTime + 1e-6 &&
+    currentSection.end > lastTime + 1e-6
+  ) {
+    const handoffSpan = Math.max(1e-6, currentSection.end - lastTime);
+    const raw = clamp01((safeTime - lastTime) / (handoffSpan * 0.78));
+    const t = easeValue(raw, nextSectionFirst.ease);
+    const left = { ...DEFAULT_CAMERA_STATE, ...lastLocal.state };
+    const right = { ...DEFAULT_CAMERA_STATE, ...nextSectionFirst.state };
+
+    return {
+      position: interpolateVector(left.position, right.position, t),
+      target: interpolateVector(left.target, right.target, t),
+      fov: lerp(left.fov, right.fov, t),
+      keyframeId: raw < 0.5 ? lastLocal.id : nextSectionFirst.id,
+      section: sectionId,
+    };
+  }
+
   return {
     ...DEFAULT_CAMERA_STATE,
     ...lastLocal.state,

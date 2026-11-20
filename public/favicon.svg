@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%" role="img" aria-label="NOVA Favicon">
+  <defs>
+    <!-- Dark Luxury Tile Base -->
+    <linearGradient id="fav-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141B26" />
+      <stop offset="100%" stop-color="#05070A" />
+    </linearGradient>
+    <linearGradient id="fav-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#1E293B" stop-opacity="0.4" />
+    </linearGradient>
+
+    <!-- Platinum Specular Facet -->
+    <linearGradient id="fav-specular" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E2E8F0" />
+    </linearGradient>
+    <!-- Machined Titanium Midtone -->
+    <linearGradient id="fav-titanium" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#64748B" />
+    </linearGradient>
+    <!-- Deep Anodized Shadow Bevel -->
+    <linearGradient id="fav-shadow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <!-- Celestial Energy Glow -->
+    <radialGradient id="fav-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#BAE6FD" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Luxury Dark Squircle Base -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#fav-bg)" stroke="url(#fav-rim)" stroke-width="1.5" />
+
+  <!-- Centered Chiseled Stellar Prism -->
+  <g id="fav-star" transform="translate(6, 6) scale(0.8125)">
+    <!-- North Blade: Left (Specular), Right (Titanium Mid) -->
+    <polygon points="32,4 27,27 32,29.5" fill="url(#fav-specular)" />
+    <polygon points="32,4 32,29.5 37,27" fill="url(#fav-titanium)" />
+
+    <!-- East Blade: Top (Specular), Bottom (Shadow) -->
+    <polygon points="60,32 34.5,32 37,27" fill="url(#fav-specular)" />
+    <polygon points="60,32 37,37 34.5,32" fill="url(#fav-shadow)" />
+
+    <!-- South Blade: Right (Mid), Left (Shadow) -->
+    <polygon points="32,60 37,37 32,34.5" fill="url(#fav-titanium)" />
+    <polygon points="32,60 32,34.5 27,37" fill="url(#fav-shadow)" />
+
+    <!-- West Blade: Bottom (Mid), Top (Specular) -->
+    <polygon points="4,32 29.5,32 27,37" fill="url(#fav-titanium)" />
+    <polygon points="4,32 27,27 29.5,32" fill="url(#fav-specular)" />
+
+    <!-- 4 Diagonal Auxiliary Flares -->
+    <polygon points="32,27 41,23 37,32 34,29" fill="url(#fav-specular)" opacity="0.95" />
+    <polygon points="37,32 41,41 32,37 34,35" fill="url(#fav-shadow)" opacity="0.9" />
+    <polygon points="32,37 23,41 27,32 30,35" fill="url(#fav-shadow)" opacity="0.9" />
+    <polygon points="27,32 23,23 32,27 30,29" fill="url(#fav-specular)" opacity="0.95" />
+
+    <!-- Central Precision Floating Core -->
+    <circle cx="32" cy="32" r="3.5" fill="url(#fav-glow)" />
+    <polygon points="32,28.8 35.2,32 32,35.2 28.8,32" fill="#FFFFFF" />
+  </g>
+</svg>

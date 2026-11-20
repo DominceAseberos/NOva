@@ -1,8 +1,16 @@
 import initialStory from "./nova-story.json";
 import { createStoryStore } from "../scroll-story/core/createStoryStore.js";
 
+if (typeof localStorage !== "undefined") {
+  try {
+    localStorage.removeItem("scroll-story:nova:draft");
+  } catch {
+    // Best-effort cleanup of stale pre-macro draft.
+  }
+}
+
 export const novaStoryStore = createStoryStore(initialStory, {
-  storageKey: "scroll-story:nova:draft",
+  storageKey: "scroll-story:nova:draft:v5",
   historyLimit: 120,
   persistDraft: true,
 });

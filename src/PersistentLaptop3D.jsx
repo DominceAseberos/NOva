@@ -8,6 +8,7 @@ import {
   evaluateCameraTrack,
   evaluateProductTrack,
   getSectionRanges,
+  lerpAngle,
   locateStoryTime,
 } from "./scroll-story/core/storyMath.js";
 import {
@@ -18,6 +19,8 @@ import { getActiveLenis } from "./scroll-story/runtime/lenisBridge.js";
 import { isStoryEditorMode, novaStoryStore } from "./story/novaStoryStore.js";
 
 import novaModelUrl from "../assets/3d/NOVA_Canonical_Laptop.glb?url";
+import screenDisplayUrl from "../assets/3d/textures/web/screen-display.webp?url";
+import screenFinalUrl from "../assets/3d/textures/web/screen-final.webp?url";
 
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const smooth = (v) => {
@@ -79,6 +82,16 @@ const FOCUS_PARTS_BY_CHAPTER = {
   BATTERY: ["battery1", "battery2", "battery3", "battery4"],
 };
 
+const FOCUS_HIGHLIGHT_BY_CHAPTER = {
+  MOTHERBOARD: { color: 0x34e8c4, emissive: 0.42, light: 3.4 },
+  GPU:         { color: 0x45f59c, emissive: 0.52, light: 4.2 },
+  CPU:         { color: 0x56c8ff, emissive: 0.52, light: 4.2 },
+  MEMORY:      { color: 0x7cd8ff, emissive: 0.48, light: 3.8 },
+  STORAGE:     { color: 0x93c5fd, emissive: 0.50, light: 3.8 },
+  COOLING:     { color: 0xff9248, emissive: 0.44, light: 4.0 },
+  BATTERY:     { color: 0xfbbf24, emissive: 0.46, light: 3.8 },
+};
+
 const FEATURE_CAMERA_FOCUS = {
   MOTHERBOARD: { object: "Motherboard", offset: [-0.10, 0.00, 0.00] },
   GPU: { object: "GPU_Package", offset: [-0.08, 0.00, 0.00] },
@@ -87,15 +100,15 @@ const FEATURE_CAMERA_FOCUS = {
   STORAGE: { object: "SSD_Module", offset: [-0.08, 0.00, 0.00] },
   COOLING: { object: "HeatPipe_1", offset: [-0.08, 0.00, 0.00] },
   BATTERY: { object: "Battery_Cell_2", offset: [-0.08, 0.00, 0.00] },
-  SCREEN_THIN: { object: "Focus_Screen_Edge", offset: [-0.30, 0.00, 0.00] },
-  KEYBOARD: { object: "Focus_Keyboard", offset: [-0.30, 0.00, 0.00] },
-  TOUCHPAD: { object: "Focus_Touchpad", offset: [-0.28, 0.00, 0.00] },
-  PORTS_RIGHT: { object: "Focus_Ports_Right", offset: [-0.30, 0.00, 0.00] },
-  PORTS_LEFT: { object: "Focus_Ports_Left", offset: [-0.30, 0.00, 0.00] },
-  EXHAUST: { object: "Focus_Exhaust", offset: [-0.30, 0.00, 0.00] },
-  SPEAKERS: { object: "Focus_Speaker_R", offset: [-0.30, 0.00, 0.00] },
-  HINGE: { object: "Focus_Hinge", offset: [-0.30, 0.00, 0.00] },
-  EDGE: { object: "Focus_Edge", offset: [-0.30, 0.00, 0.00] },
+  SCREEN_THIN: { object: "Focus_Screen_Edge", offset: [-0.26, 0.00, 0.00] },
+  KEYBOARD: { object: "Focus_Keyboard", offset: [-0.24, 0.00, 0.00] },
+  TOUCHPAD: { object: "Focus_Touchpad", offset: [-0.24, 0.00, 0.00] },
+  PORTS_RIGHT: { object: "Focus_Ports_Right", offset: [-0.24, 0.00, 0.00] },
+  PORTS_LEFT: { object: "Focus_Ports_Left", offset: [-0.24, 0.00, 0.00] },
+  EXHAUST: { object: "Focus_Exhaust", offset: [-0.24, 0.00, 0.00] },
+  SPEAKERS: { object: "Focus_Speaker_R", offset: [-0.22, 0.00, 0.00] },
+  HINGE: { object: "Focus_Hinge", offset: [-0.24, 0.00, 0.00] },
+  EDGE: { object: "Focus_Edge", offset: [-0.24, 0.00, 0.00] },
 };
 
 const DEFAULT_PART_OVERRIDE = Object.freeze({
@@ -198,12 +211,57 @@ export default function PersistentLaptop3D() {
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.94;
+    renderer.toneMappingExposure = 1.14;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, 1, 0.01, 40);
-    camera.position.set(0, 1.18, 4.45);
-    const cameraTarget = new THREE.Vector3(0, -0.08, 0);
+
+    // Synthesize a luxury studio softbox HDRI environment map via PMREMGenerator.
+    // Metallic anodized aluminum, diamond-cut silver chamfers, copper heatpipes,
+    // silicon dies, and etched trackpad glass require studio reflections to read
+    // like real CNC-machined hardware instead of flat matte plastic.
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    const envScene = new THREE.Scene();
+    envScene.background = new THREE.Color(0x06090f);
+
+    const addLightformer = (color, intensity, pos, scale, rot = [0, 0, 0]) => {
+      const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(1, 1),
+        new THREE.MeshBasicMaterial({
+          color: new THREE.Color(color).multiplyScalar(intensity),
+          side: THREE.DoubleSide,
+        })
+      );
+      mesh.position.set(...pos);
+      mesh.scale.set(...scale);
+      mesh.rotation.set(...rot);
+      envScene.add(mesh);
+    };
+
+    // Broad overhead studio softbox strip (creates sleek sheen across aluminum & glass)
+    addLightformer(0xeef5ff, 3.6, [0, 7.5, 1.5], [14, 3.8, 1], [Math.PI / 2, 0, 0]);
+    // Front-top key strip for clean metallic bevel catchlights
+    addLightformer(0xffffff, 2.8, [2.2, 4.2, 7.2], [9, 2.2, 1], [0.42, -0.25, 0]);
+    // Cool slate-cyan architectural side panel (left fill)
+    addLightformer(0x8ec5ff, 2.4, [-8.0, 2.5, 2.0], [6, 5.5, 1], [0, Math.PI / 2.2, 0]);
+    // Warm champagne-gold horizon rim strip (right/rear architectural accent)
+    addLightformer(0xffbe88, 2.2, [7.8, 2.2, -3.5], [5.5, 4.5, 1], [0, -Math.PI * 0.65, 0]);
+    // Rear crown edge kicker for thin lid & hinge definition
+    addLightformer(0xd4e6ff, 2.6, [0, 3.8, -8.0], [11, 2.0, 1], [-0.3, Math.PI, 0]);
+    // Subtle dark-slate floor bounce
+    addLightformer(0x182230, 0.9, [0, -6.0, 0], [16, 16, 1], [-Math.PI / 2, 0, 0]);
+
+    const envRT = pmrem.fromScene(envScene, 0.035);
+    scene.environment = envRT.texture;
+    envScene.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) obj.material.dispose();
+    });
+    pmrem.dispose();
+
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 40);
+    camera.position.set(0, 1.05, 4.35);
+    const cameraTarget = new THREE.Vector3(0, -0.05, 0);
     camera.lookAt(cameraTarget);
 
     const storyRoot = new THREE.Group();
@@ -295,81 +353,236 @@ export default function PersistentLaptop3D() {
       });
     }
 
-    const hemi = new THREE.HemisphereLight(0xbad8ff, 0x12151b, 1.2);
+    const hemi = new THREE.HemisphereLight(0xd6e8ff, 0x10141c, 0.85);
     scene.add(hemi);
 
-    const key = new THREE.DirectionalLight(0xcfe6ff, 3);
-    key.position.set(3.2, 4.2, 4.4);
+    const key = new THREE.DirectionalLight(0xeaf4ff, 2.4);
+    key.position.set(3.4, 4.6, 4.8);
     scene.add(key);
 
-    const rim = new THREE.DirectionalLight(0xff9355, 1.2);
-    rim.position.set(-3.5, 1.8, -3.3);
+    const rim = new THREE.DirectionalLight(0xffb47d, 1.35);
+    rim.position.set(-3.8, 2.2, -3.4);
     scene.add(rim);
 
-    const fill = new THREE.PointLight(0x75b5ff, 18, 10, 2);
-    fill.position.set(-2.2, 1.3, 2.8);
+    const fill = new THREE.PointLight(0x8bc2ff, 12, 12, 2);
+    fill.position.set(-2.6, 1.5, 3.0);
     scene.add(fill);
 
-    const warmFill = new THREE.PointLight(0xff8b4f, 8, 9, 2);
-    warmFill.position.set(2.8, 0.8, -1.8);
+    const warmFill = new THREE.PointLight(0xffa064, 6, 10, 2);
+    warmFill.position.set(3.0, 1.1, -2.0);
     scene.add(warmFill);
 
-    const cameraFill = new THREE.DirectionalLight(0xdbe8ff, 1.25);
-    cameraFill.position.set(0, 2.6, 5.2);
+    const cameraFill = new THREE.DirectionalLight(0xe4efff, 0.95);
+    cameraFill.position.set(0.4, 2.4, 5.4);
     scene.add(cameraFill);
 
-    const shadowGeo = new THREE.CircleGeometry(1, 64);
+    // Dynamic 3D hardware spotlight that smoothly tracks and illuminates the
+    // currently highlighted internal component during teardown chapters.
+    const focusSpotLight = new THREE.PointLight(0x56c8ff, 0, 2.2, 1.8);
+    focusSpotLight.position.set(0.65, 0.45, 0.85);
+    scene.add(focusSpotLight);
+    const focusHighlightColor = new THREE.Color();
+    const focusSpotTargetPos = new THREE.Vector3();
+
+    // Soft radial feathered ground shadow (never a harsh detached dark disc).
+    const shadowCanvas = document.createElement("canvas");
+    shadowCanvas.width = 256;
+    shadowCanvas.height = 256;
+    const sCtx = shadowCanvas.getContext("2d");
+    const sGrad = sCtx.createRadialGradient(128, 128, 8, 128, 128, 124);
+    sGrad.addColorStop(0, "rgba(2, 5, 10, 0.72)");
+    sGrad.addColorStop(0.45, "rgba(2, 5, 10, 0.28)");
+    sGrad.addColorStop(1, "rgba(2, 5, 10, 0)");
+    sCtx.fillStyle = sGrad;
+    sCtx.fillRect(0, 0, 256, 256);
+    const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
+
+    const shadowGeo = new THREE.PlaneGeometry(2.2, 1.2);
     const shadowMat = new THREE.MeshBasicMaterial({
-      color: 0x020407,
+      map: shadowTexture,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0,
       depthWrite: false,
     });
     const shadow = new THREE.Mesh(shadowGeo, shadowMat);
-    shadow.scale.set(0.72, 0.16, 1);
     shadow.rotation.x = -Math.PI / 2;
-    shadow.position.set(0.48, -0.64, -0.18);
+    shadow.position.set(0.68, -0.58, -0.1);
     scene.add(shadow);
 
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
+    const textureLoader = new THREE.TextureLoader();
+    const maxAniso = Math.min(8, renderer.capabilities.getMaxAnisotropy?.() || 1);
 
-    // Screen artwork is intentionally independent from the physical display
-    // geometry. Keep the existing bezel/notch/glass, but render one clean NOVA
-    // title across every story chapter.
-    const makeNovaScreenTexture = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1600;
-      canvas.height = 1000;
-      const ctx = canvas.getContext("2d");
+    const configureScreenTex = (tex, isCanvas = false) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.flipY = !isCanvas ? false : false;
+      tex.anisotropy = maxAniso;
+      tex.needsUpdate = true;
+      return tex;
+    };
 
-      const bg = ctx.createRadialGradient(800, 430, 40, 800, 500, 980);
-      bg.addColorStop(0, "#0b1725");
-      bg.addColorStop(0.46, "#07101a");
-      bg.addColorStop(1, "#020407");
+    // Screen 0: Luxury Hero Cosmic Ringed Planet OLED Artwork (high-res procedural)
+    const makeHeroCosmicScreen = () => {
+      const c = document.createElement("canvas");
+      c.width = 1600;
+      c.height = 1000;
+      const ctx = c.getContext("2d");
+
+      // Deep OLED obsidian space backdrop with rich atmospheric nebula glow
+      const bg = ctx.createRadialGradient(840, 480, 40, 800, 500, 960);
+      bg.addColorStop(0, "#112238");
+      bg.addColorStop(0.38, "#07101c");
+      bg.addColorStop(0.75, "#03070e");
+      bg.addColorStop(1, "#010205");
       ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, c.width, c.height);
+
+      // Subtle starfield
+      let seed = 4219;
+      const rand = () => {
+        seed = (seed * 16807) % 2147483647;
+        return (seed - 1) / 2147483646;
+      };
+      for (let i = 0; i < 420; i += 1) {
+        const sx = rand() * c.width;
+        const sy = rand() * c.height;
+        const sr = rand() < 0.88 ? 0.6 + rand() * 0.9 : 1.4 + rand() * 1.1;
+        const sa = 0.18 + rand() * 0.65;
+        ctx.fillStyle = `rgba(218, 234, 255, ${sa.toFixed(2)})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Back arc of cosmic planetary rings
+      ctx.save();
+      ctx.translate(800, 505);
+      ctx.rotate(-0.34);
+      for (let r = 0; r < 5; r += 1) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 390 + r * 28, 108 + r * 9, 0, Math.PI, Math.PI * 2);
+        ctx.strokeStyle = `rgba(175, 206, 240, ${(0.22 - r * 0.032).toFixed(3)})`;
+        ctx.lineWidth = r === 1 ? 14 : 6;
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Atmospheric halo behind planet
+      const halo = ctx.createRadialGradient(730, 440, 140, 800, 505, 340);
+      halo.addColorStop(0, "rgba(155, 210, 255, 0.34)");
+      halo.addColorStop(0.55, "rgba(70, 128, 196, 0.12)");
+      halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(800, 505, 340, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sculpted planet sphere with crisp sunlit limb
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(800, 505, 215, 0, Math.PI * 2);
+      ctx.clip();
+      const sphere = ctx.createRadialGradient(695, 405, 22, 775, 495, 255);
+      sphere.addColorStop(0, "#d7ebff");
+      sphere.addColorStop(0.18, "#6da3d8");
+      sphere.addColorStop(0.42, "#1c3654");
+      sphere.addColorStop(0.72, "#09131f");
+      sphere.addColorStop(1, "#02050a");
+      ctx.fillStyle = sphere;
+      ctx.fillRect(560, 270, 480, 480);
+
+      // Subtle atmospheric cloud bands across lit crescent
+      ctx.strokeStyle = "rgba(185, 220, 255, 0.14)";
+      ctx.lineWidth = 18;
+      ctx.beginPath();
+      ctx.ellipse(760, 470, 230, 62, -0.26, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(255, 212, 168, 0.08)";
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.ellipse(785, 520, 210, 50, -0.26, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Razor-crisp crescent rim highlight
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(800, 505, 215, Math.PI * 0.92, Math.PI * 1.62);
+      ctx.strokeStyle = "rgba(232, 245, 255, 0.85)";
+      ctx.lineWidth = 3.2;
+      ctx.shadowColor = "rgba(140, 205, 255, 0.95)";
+      ctx.shadowBlur = 22;
+      ctx.stroke();
+      ctx.restore();
+
+      // Front arc of planetary rings crossing over planet
+      ctx.save();
+      ctx.translate(800, 505);
+      ctx.rotate(-0.34);
+      for (let r = 0; r < 5; r += 1) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 390 + r * 28, 108 + r * 9, 0, 0, Math.PI);
+        ctx.strokeStyle = `rgba(204, 226, 250, ${(0.34 - r * 0.048).toFixed(3)})`;
+        ctx.lineWidth = r === 1 ? 15 : 6;
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      return configureScreenTex(new THREE.CanvasTexture(c), true);
+    };
+
+    // Screen 2: Stealth Performance Obsidian Studio Screen
+    const makePerformanceScreen = () => {
+      const c = document.createElement("canvas");
+      c.width = 1600;
+      c.height = 1000;
+      const ctx = c.getContext("2d");
+
+      const bg = ctx.createRadialGradient(800, 480, 30, 800, 500, 920);
+      bg.addColorStop(0, "#101e30");
+      bg.addColorStop(0.5, "#060c14");
+      bg.addColorStop(1, "#020408");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, c.width, c.height);
+
+      // Subtle geometric studio horizon rings
+      ctx.strokeStyle = "rgba(130, 190, 255, 0.14)";
+      ctx.lineWidth = 2;
+      for (let i = 1; i <= 4; i += 1) {
+        ctx.beginPath();
+        ctx.arc(800, 500, 120 * i, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // Subtle copper-cyan energy horizon line
+      const lineGrad = ctx.createLinearGradient(220, 500, 1380, 500);
+      lineGrad.addColorStop(0, "rgba(110, 185, 255, 0)");
+      lineGrad.addColorStop(0.3, "rgba(120, 200, 255, 0.55)");
+      lineGrad.addColorStop(0.7, "rgba(255, 165, 102, 0.45)");
+      lineGrad.addColorStop(1, "rgba(255, 165, 102, 0)");
+      ctx.strokeStyle = lineGrad;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(220, 500);
+      ctx.lineTo(1380, 500);
+      ctx.stroke();
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = '700 310px "Arial", "Helvetica", sans-serif';
-      ctx.fillStyle = "#f4f7fb";
-      ctx.shadowColor = "rgba(166, 211, 255, 0.18)";
-      ctx.shadowBlur = 30;
-      ctx.fillText("NOVA", canvas.width / 2, canvas.height / 2 + 10);
+      ctx.font = '300 72px "Inter", "Helvetica Neue", sans-serif';
+      ctx.fillStyle = "rgba(236, 244, 255, 0.88)";
+      ctx.letterSpacing = "26px";
+      ctx.fillText("N O V A", c.width / 2, c.height / 2 - 42);
 
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.flipY = false;
-      texture.anisotropy = Math.min(
-        8,
-        renderer.capabilities.getMaxAnisotropy?.() || 1
-      );
-      texture.needsUpdate = true;
-      return texture;
+      return configureScreenTex(new THREE.CanvasTexture(c), true);
     };
 
-    const novaScreenTexture = makeNovaScreenTexture();
+    const screenTextures = [
+      makeHeroCosmicScreen(),
+      configureScreenTex(textureLoader.load(screenDisplayUrl)),
+      makePerformanceScreen(),
+      configureScreenTex(textureLoader.load(screenFinalUrl)),
+    ];
 
     let loadedScene = null;
     let lidGroup = null;
@@ -400,91 +613,133 @@ export default function PersistentLaptop3D() {
 
     const prepareMaterial = (material) => {
       const m = material.clone();
-      m.transparent = true;
+      m.transparent = false;
       m.opacity = 1;
+      m.envMapIntensity = 1.45;
 
       if (m.name === "NOVA Graphite") {
-        m.color.setRGB(0.085, 0.092, 0.105);
-        m.metalness = 0.56;
-        m.roughness = 0.34;
+        m.color.setRGB(0.11, 0.122, 0.142);
+        m.metalness = 0.84;
+        m.roughness = 0.27;
+        m.envMapIntensity = 1.75;
       } else if (m.name === "NOVA Dark Edge") {
-        m.color.setRGB(0.028, 0.032, 0.038);
-        m.metalness = 0.40;
-        m.roughness = 0.42;
+        m.color.setRGB(0.055, 0.062, 0.075);
+        m.metalness = 0.72;
+        m.roughness = 0.30;
+        m.envMapIntensity = 1.5;
+      } else if (m.name === "Machined Chamfer" || m.name === "Machined Silver") {
+        m.color.setRGB(0.68, 0.72, 0.78);
+        m.metalness = 0.94;
+        m.roughness = 0.17;
+        m.envMapIntensity = 2.05;
+      } else if (m.name === "NOVA Lid Emblem Metal") {
+        m.color.setRGB(0.46, 0.50, 0.57);
+        m.metalness = 0.96;
+        m.roughness = 0.14;
+        m.envMapIntensity = 2.15;
+      } else if (m.name === "NOVA Lid Emblem Glow") {
+        m.color.setRGB(0.58, 0.65, 0.76);
+        if (m.emissive) m.emissive.setRGB(0.32, 0.45, 0.66);
+        m.emissiveIntensity = 0.22;
+        m.metalness = 0.90;
+        m.roughness = 0.16;
+        m.envMapIntensity = 2.0;
       } else if (m.name === "Motherboard PCB") {
-        m.color.setRGB(0.010, 0.035, 0.031);
-        m.metalness = 0.06;
-        m.roughness = 0.46;
-      } else if (m.name === "RAM PCB") {
-        m.color.setRGB(0.006, 0.015, 0.016);
-        m.metalness = 0.04;
-        m.roughness = 0.48;
-      } else if (m.name === "Contact Gold") {
-        m.color.setRGB(0.62, 0.34, 0.07);
-        m.metalness = 0.88;
-        m.roughness = 0.20;
-      } else if (m.name === "Copper") {
-        m.color.setRGB(0.58, 0.18, 0.045);
-        m.metalness = 0.78;
-        m.roughness = 0.24;
-      } else if (m.name === "Fan Dark") {
-        m.color.setRGB(0.012, 0.018, 0.026);
+        m.color.setRGB(0.014, 0.042, 0.036);
         m.metalness = 0.14;
+        m.roughness = 0.40;
+        m.envMapIntensity = 1.1;
+      } else if (m.name === "RAM PCB") {
+        m.color.setRGB(0.012, 0.022, 0.026);
+        m.metalness = 0.10;
         m.roughness = 0.42;
-      } else if (m.name === "Silicon Package") {
-        m.color.setRGB(0.025, 0.032, 0.041);
-        m.metalness = 0.24;
-        m.roughness = 0.34;
-      } else if (m.name === "Silicon Die") {
-        m.color.setRGB(0.12, 0.145, 0.18);
-        m.metalness = 0.70;
+        m.envMapIntensity = 1.05;
+      } else if (m.name === "Contact Gold") {
+        m.color.setRGB(0.86, 0.62, 0.18);
+        m.metalness = 0.94;
         m.roughness = 0.18;
+        m.envMapIntensity = 2.0;
+      } else if (m.name === "Copper") {
+        m.color.setRGB(0.84, 0.38, 0.16);
+        m.metalness = 0.92;
+        m.roughness = 0.20;
+        m.envMapIntensity = 1.95;
+      } else if (m.name === "Fan Dark") {
+        m.color.setRGB(0.032, 0.038, 0.048);
+        m.metalness = 0.36;
+        m.roughness = 0.36;
+        m.envMapIntensity = 1.25;
+      } else if (m.name === "Battery Black" || m.name === "Battery Foil") {
+        m.color.setRGB(0.028, 0.033, 0.042);
+        m.metalness = 0.24;
+        m.roughness = 0.44;
+        m.envMapIntensity = 1.15;
+      } else if (m.name === "Silicon Package") {
+        m.color.setRGB(0.032, 0.042, 0.055);
+        m.metalness = 0.28;
+        m.roughness = 0.32;
+        m.envMapIntensity = 1.2;
+      } else if (m.name === "Silicon Die") {
+        m.color.setRGB(0.26, 0.32, 0.40);
+        m.metalness = 0.92;
+        m.roughness = 0.12;
+        m.envMapIntensity = 2.25;
+      } else if (m.name === "Key Black") {
+        m.color.setRGB(0.018, 0.021, 0.026);
+        m.metalness = 0.06;
+        m.roughness = 0.56;
+        m.envMapIntensity = 0.85;
       } else if (m.name === "Keyboard Underlight") {
-        m.color.setRGB(0.010, 0.014, 0.020);
-        if (m.emissive) m.emissive.setRGB(0.24, 0.36, 0.56);
-        m.emissiveIntensity = 0.38;
+        m.color.setRGB(0.012, 0.016, 0.024);
+        if (m.emissive) m.emissive.setRGB(0.28, 0.42, 0.66);
+        m.emissiveIntensity = 0.42;
         m.metalness = 0.0;
         m.roughness = 0.42;
-      } else if (m.name === "Keyboard Legend Glow") {
-        m.color.setRGB(0.50, 0.58, 0.70);
-        if (m.emissive) m.emissive.setRGB(0.74, 0.84, 1.0);
-        m.emissiveIntensity = 1.65;
-        m.metalness = 0.0;
-        m.roughness = 0.30;
-      } else if (m.name === "Trackpad Glass") {
-        m.color.setRGB(0.018, 0.022, 0.028);
-        m.metalness = 0.05;
-        m.roughness = 0.30;
-      } else if (m.name === "Trackpad Edge") {
-        m.color.setRGB(0.060, 0.070, 0.082);
-        m.metalness = 0.62;
-        m.roughness = 0.24;
-      } else if (m.name === "Port Metal") {
-        m.color.setRGB(0.20, 0.22, 0.26);
-        m.metalness = 0.78;
-        m.roughness = 0.25;
-      } else if (m.name === "Thermal Pad") {
-        m.color.setRGB(0.035, 0.070, 0.085);
-        m.metalness = 0.0;
-        m.roughness = 0.68;
-      } else if (m.name === "PCB Silkscreen") {
-        m.color.setRGB(0.28, 0.32, 0.32);
-        m.metalness = 0.0;
-        m.roughness = 0.74;
-      } else if (m.name === "VRM Inductor") {
-        m.color.setRGB(0.028, 0.032, 0.038);
-        m.metalness = 0.24;
-        m.roughness = 0.38;
       } else if (m.name === "Keyboard Per-Key Glow") {
-        m.color.setRGB(0.12, 0.16, 0.24);
-        if (m.emissive) m.emissive.setRGB(0.54, 0.70, 1.0);
-        m.emissiveIntensity = 1.35;
+        m.color.setRGB(0.14, 0.18, 0.26);
+        if (m.emissive) m.emissive.setRGB(0.62, 0.78, 1.0);
+        m.emissiveIntensity = 1.25;
         keyboardGlowMaterials.add(m);
       } else if (m.name === "Keyboard Legend Glow") {
-        m.color.setRGB(0.70, 0.76, 0.86);
-        if (m.emissive) m.emissive.setRGB(0.72, 0.84, 1.0);
-        m.emissiveIntensity = 1.05;
+        m.color.setRGB(0.76, 0.82, 0.92);
+        if (m.emissive) m.emissive.setRGB(0.80, 0.89, 1.0);
+        m.emissiveIntensity = 1.15;
+        m.metalness = 0.0;
+        m.roughness = 0.28;
         keyboardLegendMaterials.add(m);
+      } else if (m.name === "Trackpad Glass") {
+        m.color.setRGB(0.036, 0.042, 0.052);
+        m.metalness = 0.18;
+        m.roughness = 0.16;
+        m.envMapIntensity = 1.65;
+      } else if (m.name === "Trackpad Edge") {
+        m.color.setRGB(0.24, 0.27, 0.32);
+        m.metalness = 0.86;
+        m.roughness = 0.20;
+        m.envMapIntensity = 1.85;
+      } else if (m.name === "Port Metal") {
+        m.color.setRGB(0.38, 0.42, 0.48);
+        m.metalness = 0.88;
+        m.roughness = 0.22;
+        m.envMapIntensity = 1.8;
+      } else if (m.name === "Thermal Pad") {
+        m.color.setRGB(0.06, 0.12, 0.16);
+        m.metalness = 0.0;
+        m.roughness = 0.62;
+      } else if (m.name === "PCB Silkscreen") {
+        m.color.setRGB(0.58, 0.64, 0.68);
+        m.metalness = 0.0;
+        m.roughness = 0.52;
+      } else if (m.name === "VRM Inductor") {
+        m.color.setRGB(0.052, 0.058, 0.068);
+        m.metalness = 0.42;
+        m.roughness = 0.32;
+        m.envMapIntensity = 1.3;
+      }
+
+      if (m.emissive) {
+        m.userData.baseEmissive = m.emissive.clone();
+        m.userData.baseEmissiveIntensity = m.emissiveIntensity ?? 0;
       }
 
       return m;
@@ -530,7 +785,22 @@ export default function PersistentLaptop3D() {
         });
 
         const glassMesh = loadedScene.getObjectByName("Display_Glass");
-        if (glassMesh) glassMesh.visible = false;
+        if (glassMesh) {
+          const oldGlassMat = glassMesh.material;
+          glassMesh.material = new THREE.MeshStandardMaterial({
+            color: 0x0b1220,
+            metalness: 0.15,
+            roughness: 0.06,
+            envMapIntensity: 1.9,
+            transparent: true,
+            opacity: 0.13,
+            depthWrite: false,
+          });
+          glassMesh.renderOrder = 9;
+          glassMesh.visible = true;
+          if (Array.isArray(oldGlassMat)) oldGlassMat.forEach((m) => m?.dispose?.());
+          else oldGlassMat?.dispose?.();
+        }
 
         [lidGroup, topGroup, internalGroup, lowerGroup].forEach((group) => {
           if (group) basePositions.set(group, group.position.clone());
@@ -616,11 +886,10 @@ export default function PersistentLaptop3D() {
     };
 
     const setExplode = (progress) => {
-      // Keep the service/exploded view compact enough to read as one laptop.
-      // The authored part relationships remain intact, but the previous full
-      // offset range pulled the lid/deck/lower shell and internals so far apart
-      // that the composition looked like unrelated floating slabs.
-      const p = smooth(progress) * 0.34;
+      // Balanced architectural separation: lid and keyboard deck rise cleanly
+      // above the sightline, lower milled unibody cradles below, and the full
+      // internal hardware stack fans cleanly in the center with zero clipping.
+      const p = smooth(progress) * 0.44;
       const apply = (group, dx, dy, dz) => {
         if (!group) return;
         const base = basePositions.get(group);
@@ -632,10 +901,10 @@ export default function PersistentLaptop3D() {
         );
       };
 
-      apply(lidGroup, 0, 0.235, 0.026);
-      apply(topGroup, 0, 0.245, 0.026);
-      apply(internalGroup, 0, 0.000, 0);
-      apply(lowerGroup, 0, -0.205, -0.012);
+      apply(lidGroup, 0, 0.40, -0.055);
+      apply(topGroup, 0, 0.28, -0.015);
+      apply(internalGroup, 0, 0.020, 0.045);
+      apply(lowerGroup, 0, -0.215, -0.012);
 
       if (internalGroup) {
         const offsetObject = (object, dx, dy, dz) => {
@@ -660,27 +929,27 @@ export default function PersistentLaptop3D() {
           });
         };
 
-        offsetComponent("Motherboard", 0, 0.030, 0);
-        offsetPrefix("BoardDetail_", 0, 0.030, 0);
-        offsetComponent("CPU_GPU_Package", 0, 0.050, 0);
-        offsetComponent("RAM_SODIMM_1", -0.018, 0.048, 0.010);
-        offsetComponent("RAM_SODIMM_2", -0.006, 0.056, 0.014);
-        offsetComponent("SSD_Module", -0.014, 0.042, 0);
-        offsetComponent("HeatPipe_1", 0, 0.070, 0.018);
-        offsetComponent("HeatPipe_2", 0, 0.060, 0.015);
+        offsetComponent("Motherboard", 0, 0.022, 0);
+        offsetPrefix("BoardDetail_", 0, 0.022, 0);
+        offsetComponent("CPU_GPU_Package", 0, 0.048, 0);
+        offsetComponent("RAM_SODIMM_1", -0.014, 0.048, 0.012);
+        offsetComponent("RAM_SODIMM_2", -0.006, 0.056, 0.016);
+        offsetComponent("SSD_Module", -0.012, 0.046, 0);
+        offsetComponent("HeatPipe_1", 0, 0.072, 0.014);
+        offsetComponent("HeatPipe_2", 0, 0.066, 0.012);
 
-        offsetPrefix("Fan_L", -0.052, 0.068, 0.014);
-        offsetPrefix("Fan_R", 0.052, 0.068, 0.014);
-        offsetPrefix("Heatsink_L", -0.036, 0.080, 0.010);
-        offsetPrefix("Heatsink_R", 0.036, 0.080, 0.010);
+        offsetPrefix("Fan_L", -0.036, 0.064, 0.010);
+        offsetPrefix("Fan_R", 0.036, 0.064, 0.010);
+        offsetPrefix("Heatsink_L", -0.024, 0.078, 0.008);
+        offsetPrefix("Heatsink_R", 0.024, 0.078, 0.008);
 
         for (let i = 1; i <= 4; i += 1) {
-          const dy = -0.042 - i * 0.006;
+          const dy = -0.034 - (i % 2) * 0.006;
           offsetComponent("Battery_Cell_" + i, 0, dy, 0);
           offsetComponent("BatteryDetail_Seam_" + i, 0, dy, 0);
         }
 
-        offsetComponent("Internal_Midplate", 0, -0.088, -0.008);
+        offsetComponent("Internal_Midplate", 0, -0.078, -0.006);
       }
     };
 
@@ -762,17 +1031,111 @@ export default function PersistentLaptop3D() {
       });
     };
 
-    const applyFocusDimming = (chapter, opacity = 1) => {
+    const applyFocusDimming = (chapter, opacity = 1, now = 0) => {
       const focusIds = FOCUS_PARTS_BY_CHAPTER[chapter];
-      if (!focusIds?.length) return;
+      const highlight = FOCUS_HIGHLIGHT_BY_CHAPTER[chapter];
+      const setGroupOpacity = (group, nextOpacity, writeDepth) => {
+        if (!group) return;
+        group.traverse((object) => {
+          if (!object.isMesh) return;
+          if (object.name === "Display_Glass") {
+            object.visible = nextOpacity > 0.5;
+            return;
+          }
+          const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            if (material === screenMaterial) {
+              material.opacity = nextOpacity;
+              material.depthWrite = writeDepth;
+              return;
+            }
+            material.transparent = nextOpacity < 0.99;
+            material.opacity = nextOpacity;
+            material.depthWrite = writeDepth;
+          });
+        });
+      };
+
+      const resetInternalEmissive = () => {
+        EDITABLE_PARTS.forEach((definition) => {
+          const target = partTargets.get(definition.id);
+          if (!target) return;
+          target.traverse((object) => {
+            if (!object.isMesh) return;
+            const materials = Array.isArray(object.material)
+              ? object.material
+              : [object.material];
+            materials.forEach((material) => {
+              if (!material || material === screenMaterial || !material.emissive) return;
+              if (material.userData?.baseEmissive) {
+                material.emissive.copy(material.userData.baseEmissive);
+                material.emissiveIntensity = material.userData.baseEmissiveIntensity ?? 0;
+              } else {
+                material.emissive.setRGB(0, 0, 0);
+                material.emissiveIntensity = 0;
+              }
+            });
+          });
+        });
+      };
+
+      if (!focusIds?.length) {
+        setGroupOpacity(lidGroup, opacity, true);
+        setGroupOpacity(topGroup, opacity, true);
+        resetInternalEmissive();
+
+        // For exterior hardware macro chapters (ports, exhaust, speakers, hinge,
+        // edge), aim a crisp neutral-white studio macro key light at the exact
+        // physical Focus_* marker so recessed cavities and fins gleam clearly.
+        const extConfig =
+          chapter === "HINGE" ? null : FEATURE_CAMERA_FOCUS[chapter];
+        const extTarget = extConfig ? featureTargets.get(extConfig.object) : null;
+        if (extTarget) {
+          storyRoot.updateMatrixWorld(true);
+          extTarget.getWorldPosition(focusCenterWorld);
+          focusSpotTargetPos.set(
+            focusCenterWorld.x + 0.28,
+            focusCenterWorld.y + 0.14,
+            focusCenterWorld.z + 0.48
+          );
+          focusSpotLight.position.lerp(focusSpotTargetPos, 0.25);
+          focusSpotLight.color.setHex(0xe8f3ff);
+          focusSpotLight.intensity = THREE.MathUtils.lerp(focusSpotLight.intensity, 1.45, 0.18);
+        } else {
+          focusSpotLight.intensity = THREE.MathUtils.lerp(focusSpotLight.intensity, 0, 0.18);
+        }
+        return;
+      }
+
+      // During deep internal hardware spotlight chapters, gracefully fade out
+      // the upper lid and keyboard deck so the viewer gets an unobstructed,
+      // studio-macro view of the real silicon, copper thermals, and PCB.
+      setGroupOpacity(lidGroup, opacity * 0.04, false);
+      setGroupOpacity(topGroup, opacity * 0.05, false);
+
       const focused = new Set(focusIds);
+      const pulse = 0.86 + 0.14 * Math.sin(now * 0.0042);
+      if (highlight) {
+        focusHighlightColor.setHex(highlight.color);
+      }
+
+      // Compute world-space center of focused assembly so the 3D spotlight
+      // tracks and illuminates the active component cleanly.
+      storyRoot.updateMatrixWorld(true);
+      focusBox.makeEmpty();
 
       EDITABLE_PARTS.forEach((definition) => {
         const target = partTargets.get(definition.id);
         if (!target) return;
-        const partOpacity = focused.has(definition.id)
-          ? opacity
-          : opacity * 0.16;
+        const isFocused = focused.has(definition.id);
+        if (isFocused) {
+          focusPartBox.setFromObject(target);
+          if (!focusPartBox.isEmpty()) focusBox.union(focusPartBox);
+        }
+        const partOpacity = isFocused ? opacity : opacity * 0.24;
 
         target.traverse((object) => {
           if (!object.isMesh) return;
@@ -781,20 +1144,44 @@ export default function PersistentLaptop3D() {
             : [object.material];
           materials.forEach((material) => {
             if (!material || material === screenMaterial) return;
-            material.transparent = true;
+            material.transparent = !isFocused;
             material.opacity = partOpacity;
-            material.depthWrite = focused.has(definition.id);
+            material.depthWrite = isFocused;
+            if (material.emissive) {
+              if (isFocused && highlight) {
+                material.emissive.copy(focusHighlightColor);
+                material.emissiveIntensity = highlight.emissive * pulse;
+              } else if (material.userData?.baseEmissive) {
+                material.emissive.copy(material.userData.baseEmissive);
+                material.emissiveIntensity = material.userData.baseEmissiveIntensity ?? 0;
+              } else {
+                material.emissive.setRGB(0, 0, 0);
+                material.emissiveIntensity = 0;
+              }
+            }
           });
         });
       });
+
+      if (!focusBox.isEmpty() && highlight) {
+        focusBox.getCenter(focusCenterWorld);
+        focusSpotTargetPos.set(
+          focusCenterWorld.x,
+          focusCenterWorld.y + 0.34,
+          focusCenterWorld.z + 0.42
+        );
+        focusSpotLight.position.lerp(focusSpotTargetPos, 0.22);
+        focusSpotLight.color.lerp(focusHighlightColor, 0.22);
+        focusSpotLight.intensity = THREE.MathUtils.lerp(
+          focusSpotLight.intensity,
+          highlight.light * pulse,
+          0.18
+        );
+      }
     };
 
     const applyFeatureCameraFocus = (state) => {
       if (!loadedScene || window.innerWidth < 820) return;
-      // Internal component callouts must stay spatially separated from the
-      // exploded laptop. Do not chase the moved component with the camera;
-      // the authored camera track holds the laptop while the selected part
-      // visibly peels away and returns.
       if (FOCUS_PARTS_BY_CHAPTER[state?.chapter]) return;
       const config = FEATURE_CAMERA_FOCUS[state?.chapter];
       if (!config) return;
@@ -809,28 +1196,30 @@ export default function PersistentLaptop3D() {
         featureWorld.z + config.offset[2]
       );
 
-      // Preview/editor frames are exact for screenshot/authoring QA. The live
-      // page eases toward the physical marker so scroll motion remains filmic.
-      const focusBlend = editorMode || editorCameraPreviewState ? 1 : 0.26;
+      // Gentle lock onto the exact physical feature marker while respecting
+      // our authored macro camera choreography.
+      const focusBlend = editorMode || editorCameraPreviewState ? 1 : 0.18;
       cameraTarget.lerp(featureAim, focusBlend);
       camera.lookAt(cameraTarget);
       camera.updateProjectionMatrix();
     };
 
     const setScreen = (index, dt, opacityMultiplier = 1) => {
-      if (!screenMaterial || !novaScreenTexture) return;
+      if (!screenMaterial || !screenTextures.length) return;
+      const safeIndex = Math.max(0, Math.min(screenTextures.length - 1, Math.round(index || 0)));
+      const targetTex = screenTextures[safeIndex] || screenTextures[0];
 
-      if (currentScreen !== index || screenMaterial.map !== novaScreenTexture) {
-        currentScreen = index;
-        screenMaterial.map = novaScreenTexture;
+      if (currentScreen !== safeIndex || screenMaterial.map !== targetTex) {
+        currentScreen = safeIndex;
+        screenMaterial.map = targetTex;
         screenMaterial.needsUpdate = true;
         screenFade = 1;
       }
 
-      screenFade = Math.max(0, screenFade - dt / 0.4);
-      const pulse = 1 - Math.sin(screenFade * Math.PI) * 0.22;
-      const brightness = 0.92 + pulse * 0.08;
-      screenMaterial.opacity = (0.94 + pulse * 0.06) * opacityMultiplier;
+      screenFade = Math.max(0, screenFade - dt / 0.36);
+      const pulse = 1 - Math.sin(screenFade * Math.PI) * 0.16;
+      const brightness = 0.94 + pulse * 0.06;
+      screenMaterial.opacity = opacityMultiplier;
       screenMaterial.color.setRGB(brightness, brightness, brightness);
     };
 
@@ -881,14 +1270,25 @@ export default function PersistentLaptop3D() {
 
       if (cursor <= domRanges[0].top) return domRanges[0].range.start;
 
+      const PIN_PORTION = 0.90;
+
       for (let index = 0; index < domRanges.length; index += 1) {
         const current = domRanges[index];
         const next = domRanges[index + 1];
 
         if (!next || cursor < next.top) {
-          const progress = clamp01(
-            (cursor - current.top) / Math.max(1, current.travel)
-          );
+          const offset = Math.max(0, cursor - current.top);
+          let progress;
+          if (!current.range.pin?.enabled || !next || offset <= current.travel) {
+            const pinnedRatio = clamp01(offset / Math.max(1, current.travel));
+            progress = next && current.range.pin?.enabled
+              ? pinnedRatio * PIN_PORTION
+              : pinnedRatio;
+          } else {
+            const unpinSpan = Math.max(1, next.top - (current.top + current.travel));
+            const unpinRatio = clamp01((offset - current.travel) / unpinSpan);
+            progress = PIN_PORTION + unpinRatio * (1 - PIN_PORTION);
+          }
           return current.range.start + progress * current.range.duration;
         }
       }
@@ -1010,27 +1410,26 @@ export default function PersistentLaptop3D() {
       warmFill.intensity = state.warm * 3.4;
       cameraFill.intensity = 0.85 + state.ambient * 0.55;
 
-      shadow.position.x = targetX * 0.80;
-      shadow.position.y =
-        -0.67 + Math.min(0.26, Math.max(-0.1, targetY * 0.12));
-      const shadowScale = lerp(0.48, 0.82, state.shadow);
-      shadow.scale.x = shadowScale;
-      shadow.scale.y = 0.12 + state.shadow * 0.06;
-      shadow.material.opacity = Math.min(
-        0.022,
-        0.002 + state.shadow * 0.018
-      );
+      shadow.position.x = targetX * 0.92;
+      shadow.position.y = -0.62 + Math.min(0.18, Math.max(-0.12, targetY * 0.14));
+      const shadowScale = lerp(0.55, 1.05, state.shadow);
+      shadow.scale.set(shadowScale, shadowScale * 0.62, 1);
+      const allowShadow =
+        (state.shadow ?? 0) > 0.35 && (state.explode ?? 0) < 0.05;
+      shadow.material.opacity = allowShadow
+        ? Math.min(0.42, (state.shadow - 0.32) * 0.55)
+        : 0;
 
       loadedScene.traverse((object) => {
-        if (!object.isMesh) return;
+        if (!object.isMesh || object.name === "Display_Glass") return;
         const materials = Array.isArray(object.material)
           ? object.material
           : [object.material];
         materials.forEach((material) => {
           if (material !== screenMaterial) {
-            material.transparent = true;
+            material.transparent = storyOpacity < 0.99;
             material.opacity = storyOpacity;
-            material.depthWrite = true;
+            material.depthWrite = storyOpacity >= 0.99;
           }
         });
       });
@@ -1210,11 +1609,25 @@ export default function PersistentLaptop3D() {
       );
       if (!element) return;
 
+      const PIN_PORTION = 0.90;
+      const isLastSection =
+        story.sections?.[story.sections.length - 1]?.id === section.id;
       const travel = section.pin?.enabled
         ? Math.max(1, element.offsetHeight - window.innerHeight)
         : element.offsetHeight;
-      const targetCursor =
-        element.offsetTop + located.progress * travel;
+      let pixelOffset;
+      if (!section.pin?.enabled || isLastSection || located.progress <= PIN_PORTION) {
+        const scaledProgress =
+          !isLastSection && section.pin?.enabled
+            ? located.progress / PIN_PORTION
+            : located.progress;
+        pixelOffset = scaledProgress * travel;
+      } else {
+        const unpinSpan = Math.max(1, element.offsetHeight - travel);
+        const unpinRatio = (located.progress - PIN_PORTION) / (1 - PIN_PORTION);
+        pixelOffset = travel + unpinRatio * unpinSpan;
+      }
+      const targetCursor = element.offsetTop + pixelOffset;
       const top = Math.max(0, targetCursor);
 
       // Timeline scrubbing must remain deterministic even when the shipped
@@ -1266,6 +1679,23 @@ export default function PersistentLaptop3D() {
       },
     });
 
+    // Subtle desktop pointer-reactive parallax for a tactile luxury feel.
+    let ptrTargetX = 0;
+    let ptrTargetY = 0;
+    let ptrX = 0;
+    let ptrY = 0;
+    const onPointerMove = (event) => {
+      if (editorMode || reducedMotion || window.innerWidth < 820) return;
+      ptrTargetX = (event.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
+      ptrTargetY = (event.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
+    };
+    const onPointerLeave = () => {
+      ptrTargetX = 0;
+      ptrTargetY = 0;
+    };
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerleave", onPointerLeave, { passive: true });
+
     let lastTime = performance.now();
     let frame = 0;
     const render = (now) => {
@@ -1297,51 +1727,74 @@ export default function PersistentLaptop3D() {
         const { targetX, targetY, targetScale } =
           getPresentationTargets(state);
 
+        // Framerate-independent exponential damping for cinema-grade silkiness.
+        const posDamp = editorMode ? 1 : 1 - Math.exp(-6.8 * dt);
+        const rotDamp = editorMode ? 1 : 1 - Math.exp(-6.2 * dt);
+        const ptrDamp = 1 - Math.exp(-3.6 * dt);
+        ptrX = THREE.MathUtils.lerp(ptrX, ptrTargetX, ptrDamp);
+        ptrY = THREE.MathUtils.lerp(ptrY, ptrTargetY, ptrDamp);
+
         if (!editorManipulating) {
-          // Authoring mode is frame-accurate: the scene must sit exactly
-          // on the playhead while scrubbing instead of easing behind it.
-          const blend = editorMode ? 1 : 0.075;
+          // Living multi-axis weightless float: gentle vertical breath plus
+          // subtle roll/pitch sway that calms smoothly when resting on a pedestal.
+          const isFloating = !reducedMotion && !editorMode;
+          const floatAmp = (state.shadow ?? 0) > 0.55 ? 0.45 : 1.0;
+          const floatY = isFloating
+            ? Math.sin(now * 0.00095) * 0.015 * floatAmp
+            : 0;
+          const floatRoll = isFloating
+            ? Math.sin(now * 0.00068 + 0.9) * 0.014 * floatAmp
+            : 0;
+          const floatPitch = isFloating
+            ? Math.cos(now * 0.00075) * 0.010 * floatAmp
+            : 0;
+
           storyRoot.position.x = THREE.MathUtils.lerp(
             storyRoot.position.x,
             targetX,
-            blend
+            posDamp
           );
           storyRoot.position.y = THREE.MathUtils.lerp(
             storyRoot.position.y,
-            targetY +
-              (reducedMotion || editorMode
-                ? 0
-                : Math.sin(now * 0.00065) * 0.012),
-            editorMode ? 0.22 : 0.07
+            targetY + floatY,
+            posDamp
           );
           storyRoot.position.z = THREE.MathUtils.lerp(
             storyRoot.position.z,
             state.z,
-            editorMode ? 0.22 : 0.07
+            posDamp
           );
 
-          storyRoot.rotation.x = THREE.MathUtils.lerp(
+          // Shortest-arc angular damping eliminates gimbal snapping.
+          storyRoot.rotation.x = lerpAngle(
             storyRoot.rotation.x,
-            state.rx,
-            blend
+            state.rx + floatPitch,
+            rotDamp
           );
-          storyRoot.rotation.y = THREE.MathUtils.lerp(
+          storyRoot.rotation.y = lerpAngle(
             storyRoot.rotation.y,
             state.ry,
-            blend
+            rotDamp
           );
-          storyRoot.rotation.z = THREE.MathUtils.lerp(
+          storyRoot.rotation.z = lerpAngle(
             storyRoot.rotation.z,
-            state.rz,
-            blend
+            state.rz + floatRoll,
+            rotDamp
           );
 
           const scale = THREE.MathUtils.lerp(
             storyRoot.scale.x,
             targetScale,
-            blend
+            posDamp
           );
           storyRoot.scale.setScalar(scale);
+
+          if (!editorMode && !reducedMotion && !mobile) {
+            modelRoot.rotation.y = ptrX * 0.042;
+            modelRoot.rotation.x = ptrY * 0.026;
+          } else {
+            modelRoot.rotation.set(0, 0, 0);
+          }
         }
 
         const cameraState =
@@ -1349,7 +1802,7 @@ export default function PersistentLaptop3D() {
           evaluateCameraTrack(story, state.storyTime ?? getStoryTime());
 
         if (cameraState) {
-          const cameraBlend = editorMode ? 0.22 : 0.075;
+          const cameraBlend = editorMode ? 0.32 : 1 - Math.exp(-6.2 * dt);
           camera.position.x = THREE.MathUtils.lerp(
             camera.position.x,
             cameraState.position[0],
@@ -1407,67 +1860,73 @@ export default function PersistentLaptop3D() {
         setScreen(state.screen, dt, storyOpacity);
         applyFeatureCameraFocus(state);
 
+        const lightDamp = 1 - Math.exp(-4.5 * dt);
         hemi.intensity = THREE.MathUtils.lerp(
           hemi.intensity,
-          state.ambient,
-          0.05
+          state.ambient * 0.72,
+          lightDamp
         );
         key.intensity = THREE.MathUtils.lerp(
           key.intensity,
-          state.cool,
-          0.05
+          state.cool * 0.85,
+          lightDamp
         );
         rim.intensity = THREE.MathUtils.lerp(
           rim.intensity,
-          state.warm,
-          0.05
+          state.warm * 1.1,
+          lightDamp
         );
         fill.intensity = THREE.MathUtils.lerp(
           fill.intensity,
-          state.cool * 5.0,
-          0.05
+          state.cool * 4.2,
+          lightDamp
         );
         warmFill.intensity = THREE.MathUtils.lerp(
           warmFill.intensity,
-          state.warm * 3.4,
-          0.05
+          state.warm * 3.0,
+          lightDamp
         );
         cameraFill.intensity = THREE.MathUtils.lerp(
           cameraFill.intensity,
-          0.85 + state.ambient * 0.55,
-          0.05
+          0.75 + state.ambient * 0.45,
+          lightDamp
         );
 
         shadow.position.x = THREE.MathUtils.lerp(
           shadow.position.x,
-          targetX * 0.80,
-          0.06
+          targetX * 0.92,
+          posDamp
         );
         shadow.position.y = THREE.MathUtils.lerp(
           shadow.position.y,
-          -0.67 + Math.min(0.26, Math.max(-0.1, targetY * 0.12)),
-          0.06
+          -0.62 + Math.min(0.18, Math.max(-0.12, targetY * 0.14)),
+          posDamp
         );
-        const shadowScale = lerp(0.48, 0.82, state.shadow);
-        shadow.scale.x = shadowScale;
-        shadow.scale.y = 0.12 + state.shadow * 0.06;
-        shadow.material.opacity = Math.min(0.022, 0.002 + state.shadow * 0.018);
+        const shadowScale = lerp(0.55, 1.05, state.shadow);
+        shadow.scale.set(shadowScale, shadowScale * 0.62, 1);
+        const allowShadow =
+          (state.shadow ?? 0) > 0.35 && (state.explode ?? 0) < 0.05;
+        shadow.material.opacity = THREE.MathUtils.lerp(
+          shadow.material.opacity,
+          allowShadow ? Math.min(0.42, (state.shadow - 0.32) * 0.55) : 0,
+          posDamp
+        );
 
         const opacity = storyOpacity;
         loadedScene.traverse((object) => {
-          if (!object.isMesh) return;
+          if (!object.isMesh || object.name === "Display_Glass") return;
           const materials = Array.isArray(object.material)
             ? object.material
             : [object.material];
           materials.forEach((material) => {
             if (material !== screenMaterial) {
-              material.transparent = true;
+              material.transparent = opacity < 0.99;
               material.opacity = opacity;
-              material.depthWrite = true;
+              material.depthWrite = opacity >= 0.99;
             }
           });
         });
-        applyFocusDimming(state.chapter, opacity);
+        applyFocusDimming(state.chapter, opacity, now);
 
         if (
           lastChapter !== state.chapter ||
@@ -1500,6 +1959,8 @@ export default function PersistentLaptop3D() {
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerleave", onPointerLeave);
       unregisterRuntimeApi();
       unsubscribeStory();
 
@@ -1530,7 +1991,9 @@ export default function PersistentLaptop3D() {
           }
         });
       }
-      novaScreenTexture.dispose();
+      screenTextures.forEach((t) => t?.dispose?.());
+      envRT.dispose();
+      shadowTexture.dispose();
       shadowGeo.dispose();
       shadowMat.dispose();
       renderer.dispose();

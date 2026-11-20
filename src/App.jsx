@@ -16,6 +16,10 @@ import heroAtmosphere from "../assets/web/hero-atmosphere.webp";
 import heroFgLeft from "../assets/web/hero-foreground-left.webp";
 import heroFgRight from "../assets/web/hero-foreground-right.webp";
 
+import perfBg from "../assets/performance/performance-background.webp";
+import displayBg from "../assets/display/display-background.webp";
+import mobilityBg from "../assets/mobility/mobility-background.webp";
+import mobilityArch from "../assets/web/mobility-architecture.webp";
 import finalBg from "../assets/final/final-background.webp";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -30,6 +34,64 @@ const Arrow = ({ direction = "right" }) => (
   </svg>
 );
 
+function NovaLogo({ className = "brand-logo" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="nova-logo-specular" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#E2E8F0" />
+        </linearGradient>
+        <linearGradient id="nova-logo-titanium" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#CBD5E1" />
+          <stop offset="100%" stopColor="#64748B" />
+        </linearGradient>
+        <linearGradient id="nova-logo-shadow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#475569" />
+          <stop offset="100%" stopColor="#1E293B" />
+        </linearGradient>
+        <radialGradient id="nova-logo-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="55%" stopColor="#BAE6FD" />
+          <stop offset="100%" stopColor="#0284C7" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <g id="nova-emblem-graphic">
+        {/* North Blade */}
+        <polygon points="32,4 27,27 32,29.5" fill="url(#nova-logo-specular)" />
+        <polygon points="32,4 32,29.5 37,27" fill="url(#nova-logo-titanium)" />
+
+        {/* East Blade */}
+        <polygon points="60,32 34.5,32 37,27" fill="url(#nova-logo-specular)" />
+        <polygon points="60,32 37,37 34.5,32" fill="url(#nova-logo-shadow)" />
+
+        {/* South Blade */}
+        <polygon points="32,60 37,37 32,34.5" fill="url(#nova-logo-titanium)" />
+        <polygon points="32,60 32,34.5 27,37" fill="url(#nova-logo-shadow)" />
+
+        {/* West Blade */}
+        <polygon points="4,32 29.5,32 27,37" fill="url(#nova-logo-titanium)" />
+        <polygon points="4,32 27,27 29.5,32" fill="url(#nova-logo-specular)" />
+
+        {/* 4 Diagonal Precision Chamfer Flares */}
+        <polygon points="32,27 41,23 37,32 34,29" fill="url(#nova-logo-specular)" opacity="0.95" />
+        <polygon points="37,32 41,41 32,37 34,35" fill="url(#nova-logo-shadow)" opacity="0.9" />
+        <polygon points="32,37 23,41 27,32 30,35" fill="url(#nova-logo-shadow)" opacity="0.9" />
+        <polygon points="27,32 23,23 32,27 30,29" fill="url(#nova-logo-specular)" opacity="0.95" />
+
+        {/* Floating Core Node */}
+        <circle cx="32" cy="32" r="3.5" fill="url(#nova-logo-glow)" />
+        <polygon points="32,28.8 35.2,32 32,35.2 28.8,32" fill="#FFFFFF" />
+      </g>
+    </svg>
+  );
+}
+
 function Nav() {
   const [compact, setCompact] = useState(false);
 
@@ -43,8 +105,8 @@ function Nav() {
   return (
     <header className={`site-nav ${compact ? "site-nav--compact" : ""}`}>
       <a className="brand" href="#top" aria-label="NOVA home">
-        <span className="brand-mark" aria-hidden="true" />
-        <span>NOVA</span>
+        <NovaLogo className="brand-logo" />
+        <span className="brand-name">NOVA</span>
       </a>
 
       <nav className="nav-links" aria-label="Primary navigation">
@@ -294,6 +356,7 @@ function Performance() {
   return (
     <section className="scene scene--performance scene--product-film" id="performance">
       <div className="scene-stage">
+        <img className="scene-bg scene-bg--perf" src={perfBg} alt="" decoding="async" />
         <div className="product-film-bg product-film-bg--dark" />
         <div className="product-film-grid" aria-hidden="true" />
         <div className="story-stack">
@@ -352,6 +415,7 @@ function Display() {
   return (
     <section className="scene scene--display scene--product-film" id="display">
       <div className="scene-stage">
+        <img className="scene-bg scene-bg--display" src={displayBg} alt="" decoding="async" />
         <div className="product-film-bg product-film-bg--blue" />
         <div className="product-film-grid" aria-hidden="true" />
         <div className="story-stack">
@@ -402,6 +466,8 @@ function Mobility() {
   return (
     <section className="scene scene--mobility scene--product-film" id="mobility">
       <div className="scene-stage">
+        <img className="scene-bg scene-bg--mobility" src={mobilityBg} alt="" decoding="async" />
+        <img className="mobility-architecture scene-parallax-arch" src={mobilityArch} alt="" decoding="async" />
         <div className="product-film-bg product-film-bg--silver" />
         <div className="product-film-grid product-film-grid--dark" aria-hidden="true" />
         <div className="story-stack story-stack--dark">
@@ -483,7 +549,7 @@ function FinalScene() {
   return (
     <section className="scene scene--final scene--product-film" id="final">
       <div className="scene-stage">
-        <img className="scene-bg final-bg" src={finalBg} alt="" loading="lazy" decoding="async" />
+        <img className="scene-bg final-bg" src={finalBg} alt="" decoding="async" />
         <div className="final-film-shade" />
         <div className="story-stack">
           {panels.map((panel) => <StoryPanel key={panel.chapter} {...panel} />)}
@@ -497,9 +563,9 @@ function FinalScene() {
 function Footer() {
   return (
     <footer className="footer">
-      <a className="brand brand--footer" href="#top">
-        <span className="brand-mark" aria-hidden="true" />
-        <span>NOVA</span>
+      <a className="brand brand--footer" href="#top" aria-label="NOVA home">
+        <NovaLogo className="brand-logo" />
+        <span className="brand-name">NOVA</span>
       </a>
       <div className="footer-links">
         <a href="#performance">Performance</a>
@@ -639,6 +705,55 @@ export default function App() {
         .to(".hero-copy", { yPercent: -18, opacity: 0.28, ease: "none" }, 0.48)
         .to(".hero-word-front", { yPercent: -20, opacity: 0.08, ease: "none" }, 0.48)
         .to(".scroll-indicator", { opacity: 0, ease: "none" }, 0.2);
+
+      gsap.to(".scene-bg--perf", {
+        scale: 1.08,
+        yPercent: -3.2,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".scene--performance",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2,
+        },
+      });
+
+      gsap.to(".scene-bg--display", {
+        scale: 1.07,
+        xPercent: -1.8,
+        yPercent: -2.5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".scene--display",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2,
+        },
+      });
+
+      gsap.to(".scene-bg--mobility", {
+        scale: 1.07,
+        yPercent: -3.0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".scene--mobility",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2,
+        },
+      });
+
+      gsap.to(".scene-parallax-arch", {
+        xPercent: 2.8,
+        yPercent: -4.2,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".scene--mobility",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.15,
+        },
+      });
 
       gsap.to(".final-bg", {
         scale: 1.06,

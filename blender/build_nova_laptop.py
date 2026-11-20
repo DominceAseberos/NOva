@@ -74,8 +74,10 @@ PCB_SILK = mat("PCB Silkscreen", (0.10,0.12,0.12), metallic=0.0, roughness=0.88)
 INDUCTOR = mat("VRM Inductor", (0.008,0.010,0.013), metallic=0.18, roughness=0.48)
 RAM_LABEL = mat("RAM Neutral Label", (0.055,0.060,0.068), metallic=0.0, roughness=0.82)
 SMD_TAN = mat("SMD Ceramic", (0.12,0.095,0.060), metallic=0.0, roughness=0.72)
-LOGO_METAL = mat("NOVA Lid Emblem Metal", (0.035,0.050,0.072), metallic=0.98, roughness=0.16)
-LOGO_GLOW = mat("NOVA Lid Emblem Glow", (0.16,0.032,0.008), metallic=0.12, roughness=0.24, emission=(1.0,0.15,0.025), emission_strength=1.25)
+LOGO_METAL = mat("NOVA Lid Emblem Metal", (0.24,0.27,0.32), metallic=0.96, roughness=0.14)
+LOGO_GLOW = mat("NOVA Lid Emblem Glow", (0.42,0.50,0.62), metallic=0.88, roughness=0.18, emission=(0.45,0.62,0.88), emission_strength=0.18)
+CHAMFER_SILVER = mat("Machined Chamfer", (0.36,0.40,0.46), metallic=0.95, roughness=0.16)
+BATTERY_FOIL = mat("Battery Foil", (0.008,0.010,0.014), metallic=0.22, roughness=0.44)
 
 # Keep matte engineering plastics/PCBs dark under the bright product studio.
 # Principled's default dielectric specular can otherwise make nearly-black
@@ -370,18 +372,84 @@ base_bottom = rounded_prism_xy(
     bevel_segments=3,
 )
 
-# The top-deck object is retained for the exploded/service animation, but it is
-# a thin inset structural skin embedded at the top surface. Its outer edge sits
-# 6 mm inside the unibody perimeter, so side/profile shots cannot read it as a
-# second chassis layer.
+# Subtle hollow diamond-cut anodized chamfer trim along the 4 extreme outer
+# perimeter edges ONLY (zero interior cap face, so zero Z-fighting on the deck!).
+for c_idx, (cx, cy, cw, cd) in enumerate([
+    (0.0, -D / 2 + 0.00026, W - CORNER * 1.9, 0.00052),
+    (0.0,  D / 2 - 0.00026, W - CORNER * 1.9, 0.00052),
+    (-W / 2 + 0.00026, 0.0, 0.00052, D - CORNER * 1.9),
+    ( W / 2 - 0.00026, 0.0, 0.00052, D - CORNER * 1.9),
+], start=1):
+    rounded_box(
+        f"BaseDetail_ChamferEdge_{c_idx}",
+        (cw, cd, 0.00050),
+        (cx, cy, BASE_H - 0.00018),
+        0.00016,
+        CHAMFER_SILVER,
+        2,
+    )
+
+# Internal CNC machined tub walls, acoustic speaker chambers & battery bay
+# dividers mounted to lower chassis so exploded views reveal a milled billet shell.
+for side_name, sx in (("L", -0.146), ("R", 0.146)):
+    speaker_box = rounded_box(
+        f"BaseDetail_SpeakerChamber_{side_name}",
+        (0.024, 0.102, 0.0034),
+        (sx, -0.022, BASE_H * 0.34),
+        0.0024,
+        GRAPHITE_DARK,
+        2,
+    )
+    rib_side = rounded_box(
+        f"BaseDetail_CncWall_{side_name}",
+        (0.0055, D - 0.024, 0.0044),
+        (sx * 1.075, 0.0, BASE_H * 0.42),
+        0.0012,
+        GRAPHITE_DARK,
+        2,
+    )
+for rib_idx, (rx, ry, rw, rd) in enumerate([
+    (0.0, -0.008, W - 0.044, 0.0038),
+    (0.0, -0.104, W - 0.028, 0.0042),
+    (0.0,  0.104, W - 0.028, 0.0042),
+    (-0.074, -0.058, 0.0028, 0.074),
+    ( 0.000, -0.058, 0.0028, 0.074),
+    ( 0.074, -0.058, 0.0028, 0.074),
+], start=1):
+    rounded_box(
+        f"BaseDetail_CncRib_{rib_idx:02d}",
+        (rw, rd, 0.0028),
+        (rx, ry, BASE_H * 0.28),
+        0.0008,
+        GRAPHITE_DARK,
+        2,
+    )
+
+# The top-deck object is retained for the exploded/service animation, offset
+# +0.25mm cleanly above BASE_H top plane to guarantee zero WebGL Z-fighting.
 base_top = rounded_box(
     "NOVA_TopDeck",
     (W - TOP_INSET * 2, D - TOP_INSET * 2, TOP_DECK_T),
-    (0, 0, BASE_H - TOP_DECK_T / 2 - 0.00005),
+    (0, 0, BASE_H + TOP_DECK_T / 2 + 0.00018),
     max(0.0025, CORNER * 0.62),
     GRAPHITE,
     4
 )
+for deck_idx, (dx, dy, dw, dd, dh) in enumerate([
+    (0.0,  0.096, W - TOP_INSET * 2.6, 0.008, 0.0022),
+    (0.0, -0.098, W - TOP_INSET * 2.6, 0.008, 0.0022),
+    (-(W/2 - TOP_INSET - 0.006), 0.0, 0.008, D - TOP_INSET * 2.8, 0.0022),
+    ( (W/2 - TOP_INSET - 0.006), 0.0, 0.008, D - TOP_INSET * 2.8, 0.0022),
+    (0.0,  0.022, 0.268, 0.106, 0.0013),
+], start=1):
+    rounded_box(
+        f"TopDeckDetail_Rib_{deck_idx:02d}",
+        (dw, dd, dh),
+        (dx, dy, BASE_H - dh / 2 - 0.0003),
+        0.0007,
+        GRAPHITE_DARK,
+        2,
+    )
 
 # subtle front thumb scoop
 scoop = rounded_box("Front_Thumb_Scoop", (0.045, 0.0022, 0.0020), (0,-D/2-0.0001,BASE_H*0.48), 0.001, GRAPHITE_DARK)
@@ -917,6 +985,24 @@ for side, x in (("L", -HINGE_OUTER_X), ("R", HINGE_OUTER_X)):
 lid = rounded_box("NOVA_Lid", (LID_W,LID_T,LID_H), (0,0,LID_H/2), 0.0075, GRAPHITE, 6)
 parent_keep(lid, lid_parent)
 
+# Hollow 4-edge satin-silver chamfer trim around the outer lid perimeter only
+# (zero interior cap face, so zero Z-fighting against the dark anodized lid).
+for lc_idx, (lx, lz, lw, lh) in enumerate([
+    (0.0, LID_H - 0.00024, LID_W - 0.015, 0.00050),
+    (0.0, 0.00024,         LID_W - 0.015, 0.00050),
+    (-LID_W/2 + 0.00024, LID_H/2, 0.00050, LID_H - 0.015),
+    ( LID_W/2 - 0.00024, LID_H/2, 0.00050, LID_H - 0.015),
+], start=1):
+    lid_edge = rounded_box(
+        f"NOVA_Lid_ChamferEdge_{lc_idx}",
+        (lw, 0.00052, lh),
+        (lx, -LID_T/2 + 0.00028, lz),
+        0.00014,
+        CHAMFER_SILVER,
+        2,
+    )
+    parent_keep(lid_edge, lid_parent)
+
 # Reusable NOVA brand emblem on the outside/back of the display lid.
 # The SVG is the design source; the generator turns its polygon layers into
 # shallow physical metal/glow prisms that export with the canonical laptop.
@@ -946,8 +1032,8 @@ bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 screen.data.materials.append(SCREEN)
 parent_keep(screen, lid_parent)
 
-# glass layer
-glass = rounded_box("Display_Glass", (LID_W-0.016,0.00055,LID_H-0.019), (0,-LID_T/2-0.0027,LID_H/2), 0.005, GLASS, 4)
+# glass layer (positioned just in front of Display_Active for physical reflection sheen)
+glass = rounded_box("Display_Glass", (LID_W-0.015,0.00035,LID_H-0.017), (0,-LID_T/2-0.0045,LID_H/2), 0.005, GLASS, 4)
 parent_keep(glass, lid_parent)
 
 # camera notch
@@ -1016,13 +1102,13 @@ parent_keep(focus_screen_edge, lid_parent)
 
 # Exterior top-deck assembly.
 for obj in list(bpy.context.scene.objects):
-    if obj.name in {"NOVA_TopDeck", "Keyboard_Well", "Keyboard_Backlight", "Trackpad", "Trackpad_Rim", "Trackpad_Haptic"} or obj.name.startswith("Key_") or obj.name.startswith("KeyLegend_") or obj.name.startswith("Speaker_"):
+    if obj.name in {"NOVA_TopDeck", "Keyboard_Well", "Keyboard_Backlight", "Trackpad", "Trackpad_Rim", "Trackpad_Haptic"} or obj.name.startswith("TopDeckDetail_") or obj.name.startswith("Key_") or obj.name.startswith("KeyLegend_") or obj.name.startswith("Speaker_"):
         if obj.parent is None:
             parent_keep(obj, top_group)
 
 # Lower chassis and its visible edge details.
 for obj in list(bpy.context.scene.objects):
-    if obj.name == "NOVA_Base_Bottom" or obj.name == "Front_Thumb_Scoop" or obj.name.startswith("Port_") or obj.name.startswith("Foot") or obj.name.startswith("Rear_Exhaust_"):
+    if obj.name == "NOVA_Base_Bottom" or obj.name == "Front_Thumb_Scoop" or obj.name.startswith("BaseDetail_") or obj.name.startswith("Port_") or obj.name.startswith("Foot") or obj.name.startswith("Rear_Exhaust_"):
         if obj.parent is None:
             parent_keep(obj, lower_group)
 
@@ -1257,22 +1343,91 @@ internal_mark(
     0.00205
 )
 
-# Four low-profile VRAM packages around the GPU package.
-for idx, (vx, vy) in enumerate([
-    (0.035, 0.047),
-    (0.035, 0.003),
-    (0.059, 0.025),
-    (0.011, 0.025),
+# Six low-profile GDDR7 VRAM packages arranged cleanly around the RTX GPU die.
+for idx, (vx, vy, vw, vh) in enumerate([
+    (0.026, 0.047, 0.0115, 0.0088),
+    (0.044, 0.047, 0.0115, 0.0088),
+    (0.026, 0.003, 0.0115, 0.0088),
+    (0.044, 0.003, 0.0115, 0.0088),
+    (0.059, 0.033, 0.0088, 0.0115),
+    (0.059, 0.017, 0.0088, 0.0115),
 ]):
     vram = rounded_box(
         f"Compute_VRAM_{idx+1}",
-        (0.0135, 0.0095, 0.00135),
-        (vx, vy, BASE_H*0.80),
-        0.0010,
+        (vw, vh, 0.00145),
+        (vx, vy, BASE_H*0.805),
+        0.0009,
         CHIP,
         2
     )
     parent_keep(vram, compute_group)
+
+# Micro gold MLCC decoupling capacitor rings around both CPU and GPU dies.
+for tag, cx, cy, rx_off, ry_off in (
+    ("CPU", -0.008, 0.025, 0.0118, 0.0098),
+    ("GPU",  0.035, 0.025, 0.0132, 0.0112),
+):
+    for ci in range(5):
+        tx = cx - rx_off * 0.72 + ci * (rx_off * 0.36)
+        for side_s, ty in (("N", cy + ry_off), ("S", cy - ry_off)):
+            mlcc = rounded_box(
+                f"Compute_{tag}_MLCC_{side_s}_{ci+1}",
+                (0.0021, 0.0011, 0.00065),
+                (tx, ty, BASE_H*0.865),
+                0.00018,
+                GOLD,
+                1
+            )
+            parent_keep(mlcc, compute_group)
+
+# Precision brushed-silver EMI shield cans & multi-lane copper PCB trace buses.
+for emi_idx, (ex, ey, ew, ed) in enumerate([
+    (-0.088, 0.052, 0.028, 0.015),
+    ( 0.084, 0.048, 0.026, 0.016),
+    ( 0.078,-0.014, 0.034, 0.013),
+], start=1):
+    emi = rounded_box(
+        f"BoardDetail_EMIShield_{emi_idx}",
+        (ew, ed, 0.00185),
+        (ex, ey, BASE_H*0.79),
+        0.0011,
+        SILVER,
+        2
+    )
+    parent_keep(emi, internal_group)
+
+for tr_idx, (tx, ty, tw, td) in enumerate([
+    (-0.042, 0.055, 0.068, 0.0011),
+    (-0.042, 0.052, 0.064, 0.0009),
+    ( 0.038, 0.056, 0.072, 0.0011),
+    ( 0.038, 0.053, 0.068, 0.0009),
+    ( 0.015,-0.005, 0.092, 0.0010),
+    ( 0.015,-0.008, 0.086, 0.0008),
+    (-0.066,-0.012, 0.044, 0.0010),
+], start=1):
+    trace = rounded_box(
+        f"BoardDetail_CopperTrace_{tr_idx}",
+        (tw, td, 0.00028),
+        (tx, ty, BASE_H*0.688),
+        0.00010,
+        GOLD,
+        1
+    )
+    parent_keep(trace, internal_group)
+
+# Additional VRM power stage chokes & DrMOS phases for flagship compute density.
+for v_idx, (px, py) in enumerate([
+    (-0.036, 0.014), (-0.026, 0.014), (0.068, 0.025), (0.078, 0.025),
+], start=7):
+    choke = rounded_box(
+        f"BoardDetail_VRMChoke_{v_idx}",
+        (0.0076, 0.0076, 0.0022),
+        (px, py, BASE_H*0.79),
+        0.0009,
+        INDUCTOR,
+        2
+    )
+    parent_keep(choke, internal_group)
 
 # Narrow cold-plate clamp rails keep the exposed dies visible in exploded
 # views while still communicating how the copper thermal system contacts them.
@@ -1493,32 +1648,104 @@ ssd_label = rounded_box(
 )
 parent_keep(ssd_label, internal_group)
 
-# Battery cells across the front half of the chassis.
+# High-density sculpted 4-cell obsidian lithium-polymer battery pack with
+# protective metallic retention ribs, foil seams, and BMS connector bar.
 battery_cells = []
 for idx, x in enumerate((-0.111, -0.037, 0.037, 0.111)):
-    cell = rounded_box(f"Battery_Cell_{idx+1}", (0.066, 0.072, 0.0030), (x, -0.058, BASE_H*0.43), 0.006, BATTERY_MAT, 4)
+    cell = rounded_box(
+        f"Battery_Cell_{idx+1}",
+        (0.066, 0.073, 0.0034),
+        (x, -0.058, BASE_H*0.44),
+        0.0045,
+        BATTERY_MAT,
+        4
+    )
     parent_keep(cell, internal_group)
-    seam = rounded_box(f"BatteryDetail_Seam_{idx+1}", (0.052, 0.0020, 0.0006), (x, -0.058, BASE_H*0.61), 0.0005, GRAPHITE, 1)
+    # Recessed top metallic foil pouch panel & perimeter retention trim
+    foil = rounded_box(
+        f"BatteryDetail_Foil_{idx+1}",
+        (0.058, 0.062, 0.00045),
+        (x, -0.058, BASE_H*0.615),
+        0.0024,
+        BATTERY_FOIL,
+        2
+    )
+    parent_keep(foil, internal_group)
+    seam = rounded_box(
+        f"BatteryDetail_Seam_{idx+1}",
+        (0.054, 0.0018, 0.00055),
+        (x, -0.058, BASE_H*0.642),
+        0.0004,
+        SILVER,
+        1
+    )
     parent_keep(seam, internal_group)
+    # Rear BMS bus strip & gold cell tap along battery top edge
+    bms = rounded_box(
+        f"BatteryDetail_BMS_{idx+1}",
+        (0.060, 0.0065, 0.0011),
+        (x, -0.021, BASE_H*0.565),
+        0.0008,
+        GRAPHITE_DARK,
+        1
+    )
+    parent_keep(bms, internal_group)
+    tap = rounded_box(
+        f"BatteryDetail_Tap_{idx+1}",
+        (0.012, 0.0032, 0.0005),
+        (x, -0.021, BASE_H*0.630),
+        0.00025,
+        GOLD,
+        1
+    )
+    parent_keep(tap, internal_group)
 
-# Dual blower fans. A thin dark scroll housing sits below the impeller field,
-# which makes each unit read like a real laptop centrifugal blower instead of a
-# bare decorative ring.
+# Dual precision centrifugal turbine blowers: sculpted anodized scroll shroud,
+# brushed metallic rotor hub, 32 curved aerodynamic blades & Torx mounting ears.
 for side, x in (("L", -0.105), ("R", 0.105)):
     bpy.ops.mesh.primitive_cylinder_add(
-        vertices=48,
-        radius=0.0305,
-        depth=0.00125,
-        location=(x, 0.061, BASE_H*0.625)
+        vertices=56,
+        radius=0.0315,
+        depth=0.0018,
+        location=(x, 0.061, BASE_H*0.61)
     )
     shroud = bpy.context.object
     shroud.name = f"Fan_{side}_Shroud"
     shroud.data.materials.append(FAN_MAT)
     parent_keep(shroud, internal_group)
 
+    # Outer brushed titanium housing trim ring
+    bpy.ops.mesh.primitive_torus_add(
+        major_radius=0.0308,
+        minor_radius=0.00125,
+        major_segments=56,
+        minor_segments=10,
+        location=(x, 0.061, BASE_H*0.72)
+    )
+    outer_trim = bpy.context.object
+    outer_trim.name = f"Fan_{side}_OuterTrim"
+    outer_trim.data.materials.append(GRAPHITE)
+    parent_keep(outer_trim, internal_group)
+
+    # Three precision screw mounting ears around blower shroud
+    for ear_idx, ear_deg in enumerate((-135, -35, 65), start=1):
+        ea = math.radians(ear_deg if side == "L" else 180 - ear_deg)
+        ex = x + math.cos(ea) * 0.0325
+        ey = 0.061 + math.sin(ea) * 0.0325
+        bpy.ops.mesh.primitive_cylinder_add(
+            vertices=18,
+            radius=0.0026,
+            depth=0.0015,
+            location=(ex, ey, BASE_H*0.68)
+        )
+        ear = bpy.context.object
+        ear.name = f"Fan_{side}_Mount_{ear_idx}"
+        ear.data.materials.append(SILVER)
+        parent_keep(ear, internal_group)
+
     exhaust = rounded_box(
         f"Fan_{side}_ExhaustDuct",
-        (0.050, 0.018, 0.00135),
+        (0.056, 0.019, 0.0020),
         (x, 0.087, BASE_H*0.635),
         0.0025,
         FAN_MAT,
@@ -1526,65 +1753,64 @@ for side, x in (("L", -0.105), ("R", 0.105)):
     )
     parent_keep(exhaust, internal_group)
 
-    bpy.ops.mesh.primitive_torus_add(major_radius=0.0265, minor_radius=0.0020, major_segments=48, minor_segments=10, location=(x, 0.061, BASE_H*0.67))
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.0272, minor_radius=0.0021, major_segments=56, minor_segments=10, location=(x, 0.061, BASE_H*0.69))
     fan = bpy.context.object
     fan.name = f"Fan_{side}"
     fan.data.materials.append(FAN_MAT)
     parent_keep(fan, internal_group)
 
-    bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=0.0070, depth=0.0032, location=(x, 0.061, BASE_H*0.72))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=0.0080, depth=0.0036, location=(x, 0.061, BASE_H*0.73))
     hub = bpy.context.object
     hub.name = f"Fan_{side}_Hub"
-    hub.data.materials.append(FAN_MAT)
+    hub.data.materials.append(GRAPHITE)
     parent_keep(hub, internal_group)
 
     bpy.ops.mesh.primitive_cylinder_add(
         vertices=40,
-        radius=0.0038,
-        depth=0.00355,
-        location=(x, 0.061, BASE_H*0.735)
+        radius=0.0046,
+        depth=0.00395,
+        location=(x, 0.061, BASE_H*0.745)
     )
     cap = bpy.context.object
     cap.name = f"Fan_{side}_MotorCap"
-    cap.data.materials.append(SILVER)
+    cap.data.materials.append(CHAMFER_SILVER)
     parent_keep(cap, internal_group)
 
-    # Dark intake ring and dense tangential blade field. Real notebook
-    # blowers visually read as many thin curved vanes, not bright radial spokes.
+    # Dark intake ring and dense 32-blade tangential aerodynamic impeller field.
     bpy.ops.mesh.primitive_torus_add(
-        major_radius=0.0115,
-        minor_radius=0.0009,
-        major_segments=40,
+        major_radius=0.0118,
+        minor_radius=0.00095,
+        major_segments=48,
         minor_segments=8,
-        location=(x, 0.061, BASE_H*0.735)
+        location=(x, 0.061, BASE_H*0.745)
     )
     inner_ring = bpy.context.object
     inner_ring.name = f"Fan_{side}_InnerRing"
-    inner_ring.data.materials.append(FAN_MAT)
+    inner_ring.data.materials.append(GRAPHITE)
     parent_keep(inner_ring, internal_group)
 
-    for blade in range(22):
-        ang = blade * (math.tau / 22.0)
-        bx = x + math.cos(ang) * 0.0177
-        by = 0.061 + math.sin(ang) * 0.0177
+    for blade in range(32):
+        ang = blade * (math.tau / 32.0)
+        bx = x + math.cos(ang) * 0.0185
+        by = 0.061 + math.sin(ang) * 0.0185
         b = rounded_box(
             f"Fan_{side}_Blade_{blade:02d}",
-            (0.0128, 0.0023, 0.00082),
+            (0.0135, 0.0018, 0.00125),
             (bx, by, BASE_H*0.735),
-            0.00070,
-            FAN_MAT,
-            2
+            0.00050,
+            GRAPHITE_DARK,
+            1
         )
-        b.rotation_euler.z = ang + math.radians(63)
+        b.rotation_euler.z = ang + math.radians(60 if side == "L" else -60)
         parent_keep(b, internal_group)
 
-    # Structural spokes remain dark so only the tiny motor cap catches metal.
+    # Structural stator spokes
     for spoke in range(4):
         ang = spoke * math.pi / 2 + math.radians(45)
         s = rounded_box(
             f"Fan_{side}_Spoke_{spoke:02d}",
-            (0.040, 0.0012, 0.0008),
-            (x, 0.061, BASE_H*0.748),
+            (0.044, 0.0012, 0.0008),
+            (x, 0.061, BASE_H*0.760),
             0.00038,
             FAN_MAT,
             1
@@ -1592,13 +1818,15 @@ for side, x in (("L", -0.105), ("R", 0.105)):
         s.rotation_euler.z = ang
         parent_keep(s, internal_group)
 
-# Curved copper heat pipes connecting the compute package to both thermal zones.
-def thermal_pipe(name, points, radius=0.0026):
+# Precision-routed pure copper heat pipes + vapor chamber coldplate bridge.
+# Routed cleanly ABOVE/BEHIND the blower intake centers (y >= 0.088 near fans)
+# so pipes NEVER pierce through the spinning fan blades!
+def thermal_pipe(name, points, radius=0.0028):
     curve_data = bpy.data.curves.new(name + "_Curve", type='CURVE')
     curve_data.dimensions = '3D'
-    curve_data.resolution_u = 2
+    curve_data.resolution_u = 4
     curve_data.bevel_depth = radius
-    curve_data.bevel_resolution = 3
+    curve_data.bevel_resolution = 4
     spline = curve_data.splines.new('BEZIER')
     spline.bezier_points.add(len(points) - 1)
     for bp, co in zip(spline.bezier_points, points):
@@ -1611,33 +1839,46 @@ def thermal_pipe(name, points, radius=0.0026):
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
     bpy.ops.object.convert(target='MESH')
+    # Slightly flatten heatpipes in Z like real ultra-thin laptop sintered pipes
+    obj.scale.z = 0.62
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     parent_keep(obj, internal_group)
     return obj
 
-zpipe = BASE_H * 0.53
+zpipe = BASE_H * 0.86
+# Primary dual-die copper heatpipe sweeping cleanly into rear heatsink fin stacks
 thermal_pipe("HeatPipe_1", [
-    (-0.108, 0.080, zpipe),
-    (-0.075, 0.052, zpipe),
-    (-0.018, 0.030, zpipe),
-    ( 0.018, 0.025, zpipe),
-    ( 0.070, 0.047, zpipe),
-    ( 0.108, 0.082, zpipe),
-], 0.0028)
+    (-0.126, 0.097, zpipe),
+    (-0.082, 0.094, zpipe),
+    (-0.056, 0.068, zpipe),
+    (-0.036, 0.036, zpipe),
+    (-0.008, 0.025, zpipe),
+    ( 0.035, 0.025, zpipe),
+    ( 0.062, 0.058, zpipe),
+    ( 0.084, 0.094, zpipe),
+    ( 0.126, 0.097, zpipe),
+], 0.0034)
+# Secondary parallel high-flux heatpipe crossing upper compute zone to outer fins
 thermal_pipe("HeatPipe_2", [
-    (-0.108, 0.090, zpipe + 0.0010),
-    (-0.060, 0.070, zpipe + 0.0010),
-    ( 0.010, 0.043, zpipe + 0.0010),
-    ( 0.075, 0.064, zpipe + 0.0010),
-    ( 0.108, 0.092, zpipe + 0.0010),
-], 0.0024)
+    (-0.126, 0.102, zpipe + 0.0005),
+    (-0.076, 0.099, zpipe + 0.0005),
+    (-0.044, 0.076, zpipe + 0.0005),
+    (-0.008, 0.040, zpipe + 0.0005),
+    ( 0.035, 0.040, zpipe + 0.0005),
+    ( 0.068, 0.076, zpipe + 0.0005),
+    ( 0.088, 0.099, zpipe + 0.0005),
+    ( 0.126, 0.102, zpipe + 0.0005),
+], 0.0029)
 
-# Rear heatsink fin arrays.
+# Rear high-density brushed copper heatsink fin arrays (28 crisp fins per bank).
 for side, x in (("L", -0.105), ("R", 0.105)):
-    sink = rounded_box(f"Heatsink_{side}", (0.061, 0.012, 0.0034), (x, 0.101, BASE_H*0.50), 0.0012, GRAPHITE_DARK, 2)
+    sink = rounded_box(f"Heatsink_{side}", (0.066, 0.014, 0.0036), (x, 0.101, BASE_H*0.58), 0.0012, GRAPHITE_DARK, 2)
     parent_keep(sink, internal_group)
-    for fin in range(15):
-        fx = x - 0.027 + fin * 0.00385
-        f = rounded_box(f"Heatsink_{side}_Fin_{fin:02d}", (0.0010, 0.018, 0.0052), (fx, 0.101, BASE_H*0.55), 0.00025, COPPER, 1)
+    fin_count = 28
+    fin_span = 0.060
+    for fin in range(fin_count):
+        fx = x - fin_span / 2 + fin * (fin_span / (fin_count - 1))
+        f = rounded_box(f"Heatsink_{side}_Fin_{fin:02d}", (0.00085, 0.019, 0.0056), (fx, 0.101, BASE_H*0.64), 0.00018, COPPER, 1)
         parent_keep(f, internal_group)
 
 # Internal structural carrier plate. Smaller than the old full-size slab so the
@@ -1896,7 +2137,10 @@ for idx in range(1, 5):
     join_export_meshes(
         [
             bpy.data.objects.get(f"Battery_Cell_{idx}"),
-            bpy.data.objects.get(f"BatteryDetail_Seam_{idx}")
+            bpy.data.objects.get(f"BatteryDetail_Foil_{idx}"),
+            bpy.data.objects.get(f"BatteryDetail_Seam_{idx}"),
+            bpy.data.objects.get(f"BatteryDetail_BMS_{idx}"),
+            bpy.data.objects.get(f"BatteryDetail_Tap_{idx}"),
         ],
         f"Battery_Cell_{idx}"
     )
