@@ -41,8 +41,9 @@ export class DepthStage {
 
       for (const layerDef of def.layers) {
         const zDist = Math.abs(layerDef.z);
-        // Frustum height at distance zDist with 35% overscan
-        const frustumH = 2 * zDist * Math.tan((fov * Math.PI) / 360) * 1.38;
+        // Generous overscan for background & midground to prevent exposed seams on camera pitch
+        const overscan = layerDef.type === "bg" ? 2.5 : layerDef.type === "mid" ? 2.1 : 1.45;
+        const frustumH = 2 * zDist * Math.tan((fov * Math.PI) / 360) * overscan;
         const frustumW = frustumH * aspect * (layerDef.scale || 1.0);
 
         const geo = new THREE.PlaneGeometry(frustumW, frustumH);
@@ -68,6 +69,9 @@ export class DepthStage {
         if (layerDef.anchor) {
           mesh.position.x = layerDef.anchor[0];
           mesh.position.y = layerDef.anchor[1];
+        } else if (layerDef.type === "bg") {
+          // Center along downward camera sightline
+          mesh.position.y = -1.8;
         }
 
         // Store base reference

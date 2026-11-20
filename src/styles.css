@@ -1661,6 +1661,7 @@ a:focus-visible .arrow {
   top: 50%;
   width: min(520px, 36vw);
   transform: translateY(-50%);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
 }
 
 .story-panel h2 {
@@ -1671,6 +1672,7 @@ a:focus-visible .arrow {
   font-weight: 400;
   line-height: 0.88;
   letter-spacing: -0.065em;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
 }
 
 .story-panel .scene-body {

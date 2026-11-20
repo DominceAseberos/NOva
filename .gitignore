@@ -17,6 +17,8 @@ npm-debug.log*
 # Temporary files
 *.tmp
 *-tmp.*
+# QA artifacts
+qa-artifacts/
 .qa/
 .qa-mobile/
 .qa-transition/

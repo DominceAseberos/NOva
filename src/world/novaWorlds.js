@@ -35,9 +35,9 @@ export const WORLDS = {
     fogNear: 12,
     fogFar: 68,
     layers: [
-      { id: "hero-sky", type: "bg", src: heroBg, z: -32, scale: 3.8, opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "hero-mid", type: "mid", src: heroMid, z: -18, scale: 2.4, opacity: 0.92, speed: 0.16, parallaxFactor: 0.18 },
-      { id: "hero-atmo", type: "atmo", src: heroAtmosphere, z: -8, scale: 1.8, opacity: 0.72, blend: "screen", drift: [0.015, 0.002], parallaxFactor: 0.35 },
+      { id: "hero-sky", type: "bg", src: heroBg, z: -32, scale: 4.5, anchor: [0.0, -1.4, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
+      { id: "hero-mid", type: "mid", src: heroMid, z: -18, scale: 3.2, anchor: [0.0, -1.0, 0], opacity: 0.92, speed: 0.16, parallaxFactor: 0.18 },
+      { id: "hero-atmo", type: "atmo", src: heroAtmosphere, z: -8, scale: 2.2, opacity: 0.72, blend: "screen", drift: [0.015, 0.002], parallaxFactor: 0.35 },
       { id: "hero-fgl", type: "fg", src: heroFgLeft, z: 1.8, scale: 0.92, anchor: [-1.45, -0.68, 0], opacity: 1, blur: 0.4, parallaxFactor: 2.1 },
       { id: "hero-fgr", type: "fg", src: heroFgRight, z: 1.6, scale: 0.96, anchor: [1.42, -0.72, 0], opacity: 1, blur: 0.4, parallaxFactor: 2.3 },
     ],
@@ -85,7 +85,7 @@ export const WORLDS = {
     fogNear: 10,
     fogFar: 55,
     layers: [
-      { id: "disp-bg", type: "bg", src: displayBg, z: -30, scale: 3.6, opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
+      { id: "disp-bg", type: "bg", src: displayBg, z: -30, scale: 4.8, anchor: [0.0, -1.5, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
       { id: "disp-fg", type: "fg", src: displayFg, z: 1.9, scale: 1.05, anchor: [0.05, -0.88, 0], opacity: 1, blur: 0.35, parallaxFactor: 2.15 },
     ],
     particles: { count: 420, color: 0xd8eeff, size: 0.035, bounds: [-4, 4, -2, 3, -14, 3] },
@@ -108,8 +108,8 @@ export const WORLDS = {
     fogNear: 12,
     fogFar: 60,
     layers: [
-      { id: "mob-bg", type: "bg", src: mobilityBg, z: -30, scale: 3.6, opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "mob-arch", type: "mid", src: mobilityArch, z: -14, scale: 2.2, anchor: [0.35, -0.1, 0], opacity: 0.88, speed: 0.22, parallaxFactor: 0.28 },
+      { id: "mob-bg", type: "bg", src: mobilityBg, z: -30, scale: 4.8, anchor: [0.0, -1.4, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
+      { id: "mob-arch", type: "mid", src: mobilityArch, z: -14, scale: 2.5, anchor: [0.35, -0.4, 0], opacity: 0.88, speed: 0.22, parallaxFactor: 0.28 },
     ],
     particles: { count: 320, color: 0x88a2bc, size: 0.03, bounds: [-4, 4, -2, 3, -12, 3] },
   },
@@ -131,7 +131,7 @@ export const WORLDS = {
     fogNear: 9,
     fogFar: 50,
     layers: [
-      { id: "des-bg", type: "bg", src: perfBg, z: -32, scale: 3.7, opacity: 0.65, speed: 0.04, parallaxFactor: 0.05 },
+      { id: "des-bg", type: "bg", src: perfBg, z: -32, scale: 4.8, anchor: [0.0, -1.5, 0], opacity: 0.65, speed: 0.04, parallaxFactor: 0.05 },
       { id: "des-fg", type: "fg", src: perfFg, z: 2.1, scale: 1.05, anchor: [0.2, -0.9, 0], opacity: 0.85, blur: 0.4, parallaxFactor: 2.05 },
     ],
     particles: { count: 380, color: 0xffaa66, size: 0.028, bounds: [-4, 4, -2, 3, -12, 3] },
@@ -154,7 +154,7 @@ export const WORLDS = {
     fogNear: 11,
     fogFar: 65,
     layers: [
-      { id: "fin-bg", type: "bg", src: finalBg, z: -30, scale: 3.6, opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
+      { id: "fin-bg", type: "bg", src: finalBg, z: -30, scale: 5.2, anchor: [0.0, -1.8, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
       { id: "fin-fg", type: "fg", src: finalFg, z: 1.85, scale: 1.08, anchor: [0.0, -0.84, 0], opacity: 1, blur: 0.38, parallaxFactor: 2.2 },
     ],
     particles: { count: 520, color: 0xffcf9e, size: 0.034, bounds: [-4, 4, -2, 3, -15, 3] },

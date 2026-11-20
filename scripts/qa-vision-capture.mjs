@@ -60,7 +60,13 @@ try {
     null,
     { timeout: 25000 }
   );
-  await page.waitForTimeout(2000);
+  // Disable smooth scroll inertia for frame-accurate instantaneous checkpoint navigation
+  await page.evaluate(async () => {
+    const bridge = await import("/src/scroll-story/runtime/lenisBridge.js");
+    bridge.getActiveLenis()?.destroy();
+    bridge.setActiveLenis(null);
+  });
+  await page.waitForTimeout(1000);
 
   const manifest = [];
   const framesBySection = new Map();
