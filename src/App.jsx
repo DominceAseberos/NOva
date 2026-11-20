@@ -5,6 +5,7 @@ import Lenis from "lenis";
 import StoryLayoutController from "./scroll-story/runtime/StoryLayoutController.jsx";
 import { setActiveLenis } from "./scroll-story/runtime/lenisBridge.js";
 import { isStoryEditorMode, novaStoryStore } from "./story/novaStoryStore.js";
+import { useAutoScroll } from "./scroll-story/runtime/useAutoScroll.js";
 
 const PersistentLaptop3D = lazy(() => import("./PersistentLaptop3D.jsx"));
 const ScrollStoryEditor = import.meta.env.DEV
@@ -31,6 +32,29 @@ const Arrow = ({ direction = "right" }) => (
     aria-hidden="true"
   >
     <path d="M5 12h13M13 6l6 6-6 6" />
+  </svg>
+);
+
+const PlayIcon = () => (
+  <svg
+    className="cta-icon cta-icon--play"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86a1 1 0 0 0-1.5.86z" />
+  </svg>
+);
+
+const PauseIcon = () => (
+  <svg
+    className="cta-icon cta-icon--pause"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <rect x="6" y="5" width="4" height="14" rx="1" />
+    <rect x="14" y="5" width="4" height="14" rx="1" />
   </svg>
 );
 
@@ -94,6 +118,7 @@ function NovaLogo({ className = "brand-logo" }) {
 
 function Nav() {
   const [compact, setCompact] = useState(false);
+  const { isAutoScrolling, toggleAutoScroll } = useAutoScroll();
 
   useEffect(() => {
     const onScroll = () => setCompact(window.scrollY > 40);
@@ -116,15 +141,23 @@ function Nav() {
         <a href="#design">Design</a>
       </nav>
 
-      <a className="nav-cta" href="#final">
-        Explore NOVA <Arrow />
-      </a>
+      <button
+        type="button"
+        className={`nav-cta ${isAutoScrolling ? "nav-cta--active" : ""}`}
+        onClick={toggleAutoScroll}
+        aria-label={isAutoScrolling ? "Pause auto scroll tour" : "Start auto scroll tour"}
+        title={isAutoScrolling ? "Pause auto scroll tour" : "Start cinematic 3D auto scroll tour"}
+      >
+        <span>{isAutoScrolling ? "Pause Tour" : "Auto Scroll"}</span>
+        {isAutoScrolling ? <PauseIcon /> : <PlayIcon />}
+      </button>
     </header>
   );
 }
 
 function Hero() {
   const stageRef = useRef(null);
+  const { isAutoScrolling, toggleAutoScroll } = useAutoScroll();
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -203,9 +236,16 @@ function Hero() {
             Built for people who turn difficult ideas into real work.
           </p>
           <div className="button-row">
-            <a className="button button--solid" href="#performance">
-              Explore NOVA <Arrow />
-            </a>
+            <button
+              type="button"
+              className={`button button--solid button--light ${isAutoScrolling ? "button--active" : ""}`}
+              onClick={toggleAutoScroll}
+              aria-label={isAutoScrolling ? "Pause auto scroll tour" : "Start auto scroll tour"}
+              title={isAutoScrolling ? "Pause auto scroll tour" : "Start cinematic 3D auto scroll tour"}
+            >
+              <span>{isAutoScrolling ? "Pause Tour" : "Auto Scroll"}</span>
+              {isAutoScrolling ? <PauseIcon /> : <PlayIcon />}
+            </button>
             <a className="button button--ghost" href="#display">
               Discover the display
             </a>
