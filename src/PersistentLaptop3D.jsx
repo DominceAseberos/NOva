@@ -1393,11 +1393,12 @@ export default function PersistentLaptop3D() {
         storyOpacity *= state.chapter === "RETURN" ? 0.45 : 0.16;
       }
 
-      setLid(state.lid ?? 1);
-      setKeyboardLight(state.keyboardLight ?? 1);
-      setExplode(
-        reducedMotion || state.explodeEnabled === false ? 0 : state.explode
-      );
+      currentLid = state.lid ?? 1;
+      currentExplode = reducedMotion || state.explodeEnabled === false ? 0 : (state.explode ?? 0);
+      currentKeyboardLight = state.keyboardLight ?? 1;
+      setLid(currentLid);
+      setKeyboardLight(currentKeyboardLight);
+      setExplode(currentExplode);
       applyPartOverrides(state.parts || {});
       // Component callout motion is authored explicitly in state.parts. The
       // selected part therefore moves relative to the exploded baseline and
@@ -1685,6 +1686,9 @@ export default function PersistentLaptop3D() {
     let ptrTargetY = 0;
     let ptrX = 0;
     let ptrY = 0;
+    let currentLid = 1;
+    let currentExplode = 0;
+    let currentKeyboardLight = 1;
     const onPointerMove = (event) => {
       if (editorMode || reducedMotion || window.innerWidth < 820) return;
       ptrTargetX = (event.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
@@ -1729,9 +1733,9 @@ export default function PersistentLaptop3D() {
           getPresentationTargets(state);
 
         // Framerate-independent exponential damping for cinema-grade silkiness.
-        const posDamp = editorMode ? 1 : 1 - Math.exp(-6.8 * dt);
-        const rotDamp = editorMode ? 1 : 1 - Math.exp(-6.2 * dt);
-        const ptrDamp = 1 - Math.exp(-3.6 * dt);
+        const posDamp = editorMode ? 1 : 1 - Math.exp(-7.2 * dt);
+        const rotDamp = editorMode ? 1 : 1 - Math.exp(-6.8 * dt);
+        const ptrDamp = 1 - Math.exp(-3.8 * dt);
         ptrX = THREE.MathUtils.lerp(ptrX, ptrTargetX, ptrDamp);
         ptrY = THREE.MathUtils.lerp(ptrY, ptrTargetY, ptrDamp);
 
@@ -1803,7 +1807,7 @@ export default function PersistentLaptop3D() {
           evaluateCameraTrack(story, state.storyTime ?? getStoryTime());
 
         if (cameraState) {
-          const cameraBlend = editorMode ? 0.32 : 1 - Math.exp(-6.2 * dt);
+          const cameraBlend = editorMode ? 0.32 : 1 - Math.exp(-7.2 * dt);
           camera.position.x = THREE.MathUtils.lerp(
             camera.position.x,
             cameraState.position[0],
@@ -1851,11 +1855,18 @@ export default function PersistentLaptop3D() {
         }
 
         if (!editorManipulating) {
-          setLid(state.lid ?? 1);
-          setKeyboardLight(state.keyboardLight ?? 1);
-          setExplode(
-            reducedMotion || state.explodeEnabled === false ? 0 : state.explode
-          );
+          const targetLid = state.lid ?? 1;
+          const targetExplode =
+            reducedMotion || state.explodeEnabled === false ? 0 : (state.explode ?? 0);
+          const targetKb = state.keyboardLight ?? 1;
+
+          currentLid = editorMode ? targetLid : THREE.MathUtils.lerp(currentLid, targetLid, rotDamp);
+          currentExplode = editorMode ? targetExplode : THREE.MathUtils.lerp(currentExplode, targetExplode, posDamp);
+          currentKeyboardLight = editorMode ? targetKb : THREE.MathUtils.lerp(currentKeyboardLight, targetKb, rotDamp);
+
+          setLid(currentLid);
+          setKeyboardLight(currentKeyboardLight);
+          setExplode(currentExplode);
           applyPartOverrides(state.parts || {});
         }
         setScreen(state.screen, dt, storyOpacity);

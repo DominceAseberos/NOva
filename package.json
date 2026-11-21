@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run build",
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0",
+    "dev": "vite --configLoader native --host 0.0.0.0",
+    "build": "vite build --configLoader native",
+    "preview": "vite preview --configLoader native --host 0.0.0.0",
     "qa:desktop": "node scripts/qa.mjs",
     "qa:mobile": "node scripts/qa-mobile.mjs",
     "qa:motion": "node scripts/qa-motion.mjs",

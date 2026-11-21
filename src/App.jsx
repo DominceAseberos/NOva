@@ -594,18 +594,18 @@ export default function App() {
     }
 
     const lenis = new Lenis({
-      // Lower lerp = more cinematic interpolation without making the long
-      // scroll-story feel disconnected from the wheel.
-      lerp: 0.075,
+      // Silky luxury glide: balanced damping eliminates wheel notch jumps
+      // while preserving effortless responsiveness across long story chapters.
+      lerp: 0.068,
       autoRaf: true,
       smoothWheel: true,
       syncTouch: false,
-      wheelMultiplier: 0.9,
-      touchMultiplier: 1,
+      wheelMultiplier: 0.88,
+      touchMultiplier: 1.12,
       stopInertiaOnNavigate: true,
       anchors: {
         offset: -64,
-        duration: 1.0,
+        duration: 1.1,
         easing: (t) => 1 - Math.pow(1 - t, 4),
       },
     });
