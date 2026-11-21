@@ -124,6 +124,16 @@ body.nova-persistent-3d-ready .hero-laptop {
   transition: opacity 500ms ease;
 }
 
+body.nova-persistent-3d-ready .hero-bg,
+body.nova-persistent-3d-ready .hero-atmosphere {
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+body.nova-persistent-3d-ready .hero-stage {
+  background: transparent;
+}
+
 body.nova-persistent-3d-ready .performance-product {
   z-index: 8;
 }
@@ -373,10 +383,12 @@ a:focus-visible .arrow {
 .hero-stage {
   position: sticky;
   top: 0;
+  z-index: 10;
   height: 100svh;
   min-height: 650px;
   overflow: hidden;
   background: #090e14;
+  pointer-events: none;
 }
 
 .hero-layer,
@@ -421,6 +433,7 @@ a:focus-visible .arrow {
   left: clamp(26px, 7vw, 124px);
   top: 20vh;
   width: min(660px, 45vw);
+  pointer-events: auto;
   will-change: transform, opacity;
 }
 
@@ -1522,12 +1535,15 @@ a:focus-visible .arrow {
 
 .scene--product-film {
   margin-top: 0;
-  background: #06090d;
+  background: transparent;
+  pointer-events: none;
 }
 
 .scene--product-film .scene-stage {
+  z-index: 10;
   isolation: isolate;
-  background: #06090d;
+  background: transparent;
+  pointer-events: none;
 }
 
 .scene--product-film .scene-bg {
@@ -1567,32 +1583,23 @@ a:focus-visible .arrow {
   z-index: 1;
   inset: 0;
   pointer-events: none;
+  background: transparent !important;
 }
 
 .product-film-bg--dark {
-  background:
-    radial-gradient(circle at 72% 46%, rgba(92, 152, 220, 0.18), transparent 34%),
-    radial-gradient(circle at 74% 72%, rgba(240, 128, 66, 0.10), transparent 32%),
-    linear-gradient(90deg, rgba(3, 5, 9, 0.92) 0%, rgba(5, 9, 15, 0.72) 48%, rgba(4, 7, 12, 0.56) 100%);
+  background: transparent;
 }
 
 .product-film-bg--blue {
-  background:
-    radial-gradient(circle at 74% 48%, rgba(112, 173, 235, 0.14), transparent 32%),
-    linear-gradient(90deg, rgba(4, 7, 12, 0.88) 0%, rgba(7, 13, 22, 0.52) 48%, rgba(4, 7, 12, 0.28) 100%);
+  background: transparent;
 }
 
 .product-film-bg--silver {
-  background:
-    radial-gradient(circle at 74% 46%, rgba(255, 255, 255, 0.34), transparent 34%),
-    linear-gradient(90deg, rgba(224, 232, 238, 0.86) 0%, rgba(212, 222, 230, 0.42) 46%, rgba(210, 220, 228, 0.10) 100%);
+  background: transparent;
 }
 
 .product-film-bg--graphite {
-  background:
-    radial-gradient(circle at 74% 45%, rgba(137, 167, 203, 0.22), transparent 30%),
-    radial-gradient(circle at 66% 62%, rgba(242, 156, 98, 0.08), transparent 28%),
-    linear-gradient(145deg, #070a0f 0%, #0f1622 55%, #05070b 100%);
+  background: transparent;
 }
 
 .product-film-grid {
@@ -1600,7 +1607,7 @@ a:focus-visible .arrow {
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.16;
   background-image:
     linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
@@ -1609,7 +1616,7 @@ a:focus-visible .arrow {
 }
 
 .product-film-grid--dark {
-  opacity: 0.18;
+  opacity: 0.12;
   background-image:
     linear-gradient(rgba(11,18,25,0.14) 1px, transparent 1px),
     linear-gradient(90deg, rgba(11,18,25,0.14) 1px, transparent 1px);
@@ -1629,9 +1636,9 @@ a:focus-visible .arrow {
   position: absolute;
   z-index: 0;
   inset: 0 auto 0 0;
-  width: min(48vw, 690px);
+  width: min(52vw, 720px);
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(3,7,11,0.98) 0%, rgba(3,7,11,0.90) 58%, rgba(3,7,11,0.42) 82%, transparent 100%);
+  background: linear-gradient(90deg, rgba(3,7,11,0.95) 0%, rgba(3,7,11,0.84) 56%, rgba(3,7,11,0.30) 84%, transparent 100%);
 }
 
 .story-stack--dark::before {
@@ -1650,9 +1657,9 @@ a:focus-visible .arrow {
   pointer-events: none;
   transform: translateY(18px);
   transition:
-    opacity 320ms cubic-bezier(.16,1,.3,1),
+    opacity 360ms cubic-bezier(.16,1,.3,1),
     transform 460ms cubic-bezier(.16,1,.3,1),
-    visibility 320ms;
+    visibility 360ms;
 }
 
 .story-panel__copy {
@@ -1661,6 +1668,7 @@ a:focus-visible .arrow {
   top: 50%;
   width: min(520px, 36vw);
   transform: translateY(-50%);
+  pointer-events: auto;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
 }
 
@@ -1669,15 +1677,18 @@ a:focus-visible .arrow {
   max-width: 540px;
   font-family: "Manrope", sans-serif;
   font-size: clamp(3.1rem, 5.6vw, 6.8rem);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 0.88;
   letter-spacing: -0.065em;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
+  color: #f4f6f8;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.85);
 }
 
 .story-panel .scene-body {
   margin-top: 26px;
   max-width: 470px;
+  color: rgba(240, 246, 255, 0.82);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
 }
 
 .story-metrics {
@@ -1961,3 +1972,175 @@ body[data-story-chapter="NOVA"] [data-story-panel="NOVA"] {
     font-size: 0.54rem;
   }
 }
+
+/* --------------------------------------------------------------------------
+   NOVA LUXURY TECH INITIAL PRELOADER
+   -------------------------------------------------------------------------- */
+
+.nova-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #030508;
+  color: #f4f6f8;
+  pointer-events: all;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 750ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 750ms ease,
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nova-preloader--done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(1.025);
+}
+
+.nova-preloader__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(18, 32, 54, 0.42), transparent 58%),
+    radial-gradient(circle at 80% 80%, rgba(14, 25, 42, 0.28), transparent 45%),
+    #030508;
+}
+
+.nova-preloader__glow {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(125, 185, 255, 0.08) 0%, rgba(80, 140, 220, 0.02) 48%, transparent 70%);
+  pointer-events: none;
+  animation: preloaderPulse 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes preloaderPulse {
+  0% { transform: scale(0.92); opacity: 0.6; }
+  100% { transform: scale(1.08); opacity: 1; }
+}
+
+.nova-preloader__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(440px, 88vw);
+  text-align: center;
+}
+
+.nova-preloader__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.nova-preloader__logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+}
+
+.nova-preloader__logo {
+  width: 32px;
+  height: 32px;
+  color: #ffffff;
+  filter: drop-shadow(0 0 16px rgba(180, 220, 255, 0.65));
+}
+
+.nova-preloader__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(180, 220, 255, 0.18);
+  border-top-color: rgba(180, 220, 255, 0.85);
+  animation: preloaderSpin 2.4s linear infinite;
+}
+
+@keyframes preloaderSpin {
+  to { transform: rotate(360deg); }
+}
+
+.nova-preloader__brand-name {
+  font-family: "Manrope", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: #ffffff;
+  text-indent: 0.28em;
+}
+
+.nova-preloader__telemetry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.nova-preloader__label {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: uppercase;
+}
+
+.nova-preloader__status {
+  font-family: monospace;
+  font-size: 0.70rem;
+  letter-spacing: 0.12em;
+  color: rgba(210, 230, 255, 0.88);
+  text-transform: uppercase;
+  min-height: 1.2em;
+}
+
+.nova-preloader__bar-container {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.nova-preloader__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4da4ff 0%, #a8d5ff 85%, #ffffff 100%);
+  box-shadow: 0 0 12px rgba(140, 200, 255, 0.85);
+  transition: width 120ms ease-out;
+}
+
+.nova-preloader__footer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: monospace;
+  font-size: 0.60rem;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.42);
+  text-transform: uppercase;
+}
+
+.nova-preloader__pct {
+  color: #72baff;
+  font-weight: 600;
+}
+
+.nova-preloader__hud {
+  color: rgba(255, 255, 255, 0.30);
+  letter-spacing: 0.12em;
+}
+

@@ -1982,8 +1982,6 @@ export default function PersistentLaptop3D() {
         heroFallback.style.removeProperty("visibility");
       }
 
-      delete document.body.dataset.storyChapter;
-
       if (loadedScene) {
         loadedScene.traverse((object) => {
           if (object.geometry) object.geometry.dispose?.();
