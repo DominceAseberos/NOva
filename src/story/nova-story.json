@@ -1105,7 +1105,7 @@
       {
         "id": "perf-bat-hold",
         "section": "performance",
-        "progress": 0.9,
+        "progress": 0.88,
         "chapter": "BATTERY",
         "ease": "smooth",
         "state": {
@@ -1205,7 +1205,7 @@
       {
         "id": "perf-reassemble",
         "section": "performance",
-        "progress": 0.9,
+        "progress": 0.98,
         "chapter": "REASSEMBLE",
         "ease": "smooth",
         "state": {

@@ -110,13 +110,15 @@ export class DepthStage {
     const speeds = new Float32Array(pCount * 3);
 
     for (let i = 0; i < pCount; i++) {
-      positions[i * 3 + 0] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 0] = (Math.random() - 0.5) * 12;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 6;
-      positions[i * 3 + 2] = -15 + Math.random() * 18; // distributed from z=-15 to z=+3
+      // Confined strictly behind the laptop (z <= -0.6) so dust motes never
+      // clip through the camera lens or occlude the product during macro inspection.
+      positions[i * 3 + 2] = -22 + Math.random() * 20; // z from -22 to -2
 
-      speeds[i * 3 + 0] = (Math.random() - 0.5) * 0.004;
-      speeds[i * 3 + 1] = 0.002 + Math.random() * 0.005; // gentle upward thermal drift
-      speeds[i * 3 + 2] = (Math.random() - 0.5) * 0.003;
+      speeds[i * 3 + 0] = (Math.random() - 0.5) * 0.003;
+      speeds[i * 3 + 1] = 0.001 + Math.random() * 0.004; // gentle upward thermal drift
+      speeds[i * 3 + 2] = (Math.random() - 0.5) * 0.002;
     }
 
     pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -145,7 +147,7 @@ export class DepthStage {
     });
 
     this.particleSystem = new THREE.Points(pGeo, pMat);
-    this.particleSystem.renderOrder = 4;
+    this.particleSystem.renderOrder = -4;
     this.scene.add(this.particleSystem);
   }
 
@@ -180,7 +182,15 @@ export class DepthStage {
 
       for (const mesh of node.layers) {
         const u = mesh.userData;
-        mesh.material.opacity = u.targetOpacity * worldWeight;
+        let layerAlpha = u.targetOpacity * worldWeight;
+        if (u.type === "fg") {
+          // Macro proximity fade: ensure foreground bokeh planes never clip or occlude when camera is close
+          const camZ = camera.position.z;
+          const fgClearance = camZ - mesh.position.z;
+          const fgFade = THREE.MathUtils.clamp((fgClearance - 0.45) / 0.85, 0, 1);
+          layerAlpha *= fgFade;
+        }
+        mesh.material.opacity = layerAlpha;
 
         // Monotonic mathematical parallax:
         // L0/L1 move with subtle counter-shift; L4 moves fast across view
@@ -221,18 +231,27 @@ export class DepthStage {
       const pos = posAttr.array;
       const vel = velAttr.array;
 
+      const camMoveX = camera.position.x - this.lastCamPos.x;
+      const camMoveY = camera.position.y - this.lastCamPos.y;
+
       for (let i = 0; i < pos.length; i += 3) {
-        pos[i + 0] += vel[i + 0] * (dt * 60) - camDeltaX * 0.002;
-        pos[i + 1] += vel[i + 1] * (dt * 60) - camDeltaY * 0.002;
+        pos[i + 0] += vel[i + 0] * (dt * 60) - camMoveX * 0.12;
+        pos[i + 1] += vel[i + 1] * (dt * 60) - camMoveY * 0.12;
         pos[i + 2] += vel[i + 2] * (dt * 60);
 
         // Particle volume boundary wrap
         if (pos[i + 1] > 3.5) pos[i + 1] = -2.5;
-        if (pos[i + 0] > 5) pos[i + 0] = -5;
-        if (pos[i + 0] < -5) pos[i + 0] = 5;
+        if (pos[i + 0] > 6) pos[i + 0] = -6;
+        if (pos[i + 0] < -6) pos[i + 0] = 6;
       }
       posAttr.needsUpdate = true;
+
+      // Softly attenuate particle opacity when camera moves into macro close-up
+      const currentCamDist = Math.hypot(camera.position.x, camera.position.y - 1.0, camera.position.z);
+      const macroParticleFade = THREE.MathUtils.clamp((currentCamDist - 2.8) / 1.2, 0.2, 1.0);
+      this.particleSystem.material.opacity = 0.55 * macroParticleFade;
     }
+    this.lastCamPos.copy(camera.position);
   }
 
   setupDepthInspectionHook() {

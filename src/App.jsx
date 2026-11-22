@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Component, lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -8,6 +8,23 @@ import { isStoryEditorMode, novaStoryStore } from "./story/novaStoryStore.js";
 import { useAutoScroll } from "./scroll-story/runtime/useAutoScroll.js";
 import NovaPreloader from "./ui/NovaPreloader.jsx";
 import { NovaLogo } from "./brand/NovaLogo.jsx";
+import WorkstationConfigurator from "./configurator/WorkstationConfigurator.jsx";
+
+class Laptop3DErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return null;
+    }
+    return this.props.children;
+  }
+}
 
 const PersistentLaptop3D = lazy(() => import("./PersistentLaptop3D.jsx"));
 const ScrollStoryEditor = import.meta.env.DEV
@@ -83,6 +100,7 @@ function Nav() {
         <a href="#display">Display</a>
         <a href="#mobility">Mobility</a>
         <a href="#design">Design</a>
+        <a href="#configure">Configure</a>
       </nav>
 
       <button
@@ -564,9 +582,11 @@ function Footer() {
 
 function DeferredPersistentProduct() {
   return (
-    <Suspense fallback={null}>
-      <PersistentLaptop3D />
-    </Suspense>
+    <Laptop3DErrorBoundary>
+      <Suspense fallback={null}>
+        <PersistentLaptop3D />
+      </Suspense>
+    </Laptop3DErrorBoundary>
   );
 }
 
@@ -753,6 +773,7 @@ export default function App() {
         <Mobility />
         <Details />
         <FinalScene />
+        <WorkstationConfigurator />
       </main>
       <Footer />
     </div>

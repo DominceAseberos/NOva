@@ -1,0 +1,290 @@
+.nova-config-section {
+  position: relative;
+  z-index: 25;
+  background: #0a0c10;
+  color: #f4f6fa;
+  padding: 96px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer {
+  position: relative;
+  z-index: 25;
+}
+
+.nova-config-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nova-config-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.nova-config-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  margin: 0 0 8px;
+}
+
+.nova-config-header h2 {
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 0 0 8px;
+}
+
+.nova-config-sub {
+  color: rgba(244, 246, 250, 0.7);
+  max-width: 600px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.nova-config-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nova-config-tabs button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f4f6fa;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.nova-config-tabs button.is-active {
+  background: #f4f6fa;
+  color: #0a0c10;
+  font-weight: 600;
+}
+
+.nova-config-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+}
+
+.nova-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.nova-preset-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f4f6fa;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nova-preset-card span {
+  font-size: 11px;
+  color: rgba(244, 246, 250, 0.68);
+}
+
+.nova-preset-card b {
+  color: #7dd3fc;
+  font-size: 13px;
+}
+
+.nova-selectors {
+  display: grid;
+  gap: 12px;
+}
+
+.nova-selectors label,
+.nova-quote-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.nova-selectors select,
+.nova-quote-card input,
+.nova-quote-card select,
+.nova-quote-card textarea,
+.nova-compare-head select {
+  background: #12161f;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f4f6fa;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.nova-compat-alert {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #fecaca;
+  font-size: 12px;
+}
+
+.nova-compare-box,
+.nova-quote-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.nova-compare-box {
+  margin-top: 20px;
+}
+
+.nova-compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.nova-compare-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  font-size: 12px;
+}
+
+.nova-compare-cols ul {
+  padding-left: 16px;
+  margin: 8px 0 0;
+  color: rgba(244, 246, 250, 0.78);
+}
+
+.nova-price-banner {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(125, 211, 252, 0.08);
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  margin-bottom: 16px;
+}
+
+.nova-price-banner span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: rgba(244, 246, 250, 0.65);
+}
+
+.nova-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.nova-err {
+  color: #fca5a5;
+  font-size: 11px;
+}
+
+.nova-submit-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px 18px;
+  border-radius: 999px;
+  border: 0;
+  background: #7dd3fc;
+  color: #081018;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nova-submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nova-outline-btn {
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #f4f6fa;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.nova-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.nova-lookup-details {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.nova-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  background: rgba(125, 211, 252, 0.15);
+  color: #7dd3fc;
+}
+
+.nova-table-wrap {
+  overflow-x: auto;
+}
+
+.nova-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.nova-table th,
+.nova-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nova-seed-toggle {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .nova-config-grid,
+  .nova-presets,
+  .nova-form-row,
+  .nova-compare-cols {
+    grid-template-columns: 1fr;
+  }
+}

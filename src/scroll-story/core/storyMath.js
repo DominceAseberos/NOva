@@ -16,11 +16,20 @@ export const easeValue = (value, ease = "smooth") => {
 
 export const lerp = (a, b, t) => a + (b - a) * t;
 
+export const normalizeAngle = (angle) => {
+  let a = Number(angle) || 0;
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+};
+
 export const lerpAngle = (a, b, t) => {
-  let delta = b - a;
+  const normA = normalizeAngle(a);
+  const normB = normalizeAngle(b);
+  let delta = normB - normA;
   while (delta > Math.PI) delta -= Math.PI * 2;
   while (delta < -Math.PI) delta += Math.PI * 2;
-  return a + delta * t;
+  return normalizeAngle(normA + delta * t);
 };
 
 export const DEFAULT_PRODUCT_STATE = Object.freeze({

@@ -257,7 +257,7 @@ export default function PersistentLaptop3D() {
     });
     pmrem.dispose();
 
-    const camera = new THREE.PerspectiveCamera(34, 1, 0.01, 40);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.08, 60);
     camera.position.set(0, 1.05, 4.35);
     const cameraTarget = new THREE.Vector3(0, -0.05, 0);
     camera.lookAt(cameraTarget);
@@ -1181,28 +1181,10 @@ export default function PersistentLaptop3D() {
       }
     };
 
-    const applyFeatureCameraFocus = (state) => {
-      if (!loadedScene || window.innerWidth < 820) return;
-      if (FOCUS_PARTS_BY_CHAPTER[state?.chapter]) return;
-      const config = FEATURE_CAMERA_FOCUS[state?.chapter];
-      if (!config) return;
-      const target = featureTargets.get(config.object);
-      if (!target) return;
-
-      storyRoot.updateMatrixWorld(true);
-      target.getWorldPosition(featureWorld);
-      featureAim.set(
-        featureWorld.x + config.offset[0],
-        featureWorld.y + config.offset[1],
-        featureWorld.z + config.offset[2]
-      );
-
-      // Gentle lock onto the exact physical feature marker while respecting
-      // our authored macro camera choreography.
-      const focusBlend = editorMode || editorCameraPreviewState ? 1 : 0.18;
-      cameraTarget.lerp(featureAim, focusBlend);
-      camera.lookAt(cameraTarget);
-      camera.updateProjectionMatrix();
+    const applyFeatureCameraFocus = (_state) => {
+      // Intentionally bypassed: Camera choreography is authored continuously
+      // in nova-story.json. Bypassing dual-target overrides eradicates camera
+      // target fighting and close-up macro twitching.
     };
 
     const setScreen = (index, dt, opacityMultiplier = 1) => {
@@ -1732,26 +1714,40 @@ export default function PersistentLaptop3D() {
         const { targetX, targetY, targetScale } =
           getPresentationTargets(state);
 
-        // Framerate-independent exponential damping for cinema-grade silkiness.
+        // Framerate-independent exponential damping synchronized across translation & rotation.
         const posDamp = editorMode ? 1 : 1 - Math.exp(-7.2 * dt);
-        const rotDamp = editorMode ? 1 : 1 - Math.exp(-6.8 * dt);
+        const rotDamp = editorMode ? 1 : 1 - Math.exp(-7.2 * dt);
         const ptrDamp = 1 - Math.exp(-3.8 * dt);
         ptrX = THREE.MathUtils.lerp(ptrX, ptrTargetX, ptrDamp);
         ptrY = THREE.MathUtils.lerp(ptrY, ptrTargetY, ptrDamp);
 
+        // Compute camera-to-subject proximity for studio macro stability.
+        const currentCamDist = Math.hypot(
+          camera.position.x - cameraTarget.x,
+          camera.position.y - cameraTarget.y,
+          camera.position.z - cameraTarget.z
+        );
+        // Continuous studio stability curve:
+        // Hero wide shots have 100% organic breath & tactile pointer parallax.
+        // Macro close-ups (scale > 1.12 or camera distance < 3.2) progressively lock down
+        // to exactly 0.0, achieving rock-solid museum-grade immobility without vibration.
+        const scaleAtten = THREE.MathUtils.clamp((1.20 - targetScale) / 0.32, 0, 1);
+        const distAtten = THREE.MathUtils.clamp((currentCamDist - 3.1) / 1.1, 0, 1);
+        const macroStability = Math.min(scaleAtten, distAtten);
+
         if (!editorManipulating) {
           // Living multi-axis weightless float: gentle vertical breath plus
-          // subtle roll/pitch sway that calms smoothly when resting on a pedestal.
+          // subtle roll/pitch sway that calms smoothly when resting or in macro zoom.
           const isFloating = !reducedMotion && !editorMode;
-          const floatAmp = (state.shadow ?? 0) > 0.55 ? 0.45 : 1.0;
+          const floatAmp = ((state.shadow ?? 0) > 0.55 ? 0.45 : 1.0) * macroStability;
           const floatY = isFloating
-            ? Math.sin(now * 0.00095) * 0.015 * floatAmp
+            ? Math.sin(now * 0.00095) * 0.012 * floatAmp
             : 0;
           const floatRoll = isFloating
-            ? Math.sin(now * 0.00068 + 0.9) * 0.014 * floatAmp
+            ? Math.sin(now * 0.00068 + 0.9) * 0.008 * floatAmp
             : 0;
           const floatPitch = isFloating
-            ? Math.cos(now * 0.00075) * 0.010 * floatAmp
+            ? Math.cos(now * 0.00075) * 0.006 * floatAmp
             : 0;
 
           storyRoot.position.x = THREE.MathUtils.lerp(
@@ -1795,8 +1791,8 @@ export default function PersistentLaptop3D() {
           storyRoot.scale.setScalar(scale);
 
           if (!editorMode && !reducedMotion && !mobile) {
-            modelRoot.rotation.y = ptrX * 0.042;
-            modelRoot.rotation.x = ptrY * 0.026;
+            modelRoot.rotation.y = ptrX * 0.038 * macroStability;
+            modelRoot.rotation.x = ptrY * 0.024 * macroStability;
           } else {
             modelRoot.rotation.set(0, 0, 0);
           }
