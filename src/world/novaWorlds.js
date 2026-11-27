@@ -1,21 +1,15 @@
-import heroBg from "../../assets/hero/hero-background.webp";
 import heroMid from "../../assets/hero/hero-midground.webp";
 import heroAtmosphere from "../../assets/web/hero-atmosphere.webp";
-import heroFgLeft from "../../assets/web/hero-foreground-left.webp";
-import heroFgRight from "../../assets/web/hero-foreground-right.webp";
 
 import perfBg from "../../assets/performance/performance-background.webp";
-import perfFg from "../../assets/performance/performance-foreground.png";
 import perfAirflow from "../../assets/web/performance-airflow.webp";
 
 import displayBg from "../../assets/display/display-background.webp";
-import displayFg from "../../assets/display/display-foreground.png";
 
 import mobilityBg from "../../assets/mobility/mobility-background.webp";
 import mobilityArch from "../../assets/web/mobility-architecture.webp";
 
 import finalBg from "../../assets/final/final-background.webp";
-import finalFg from "../../assets/final/final-foreground.png";
 
 export const WORLDS = {
   top: {
@@ -31,17 +25,36 @@ export const WORLDS = {
     fillColor: 0x82b4ea,
     fillIntensity: 3.2,
     fillPosition: [-6.5, 2.0, 3.0],
-    fogColor: 0x090e15,
-    fogNear: 12,
+    fogColor: 0x090e16,
+    fogNear: 14,
     fogFar: 68,
+    // Aspect-locked bottom-anchored parallax horizon strips (zero floating stones, zero fullscreen stretch)
     layers: [
-      { id: "hero-sky", type: "bg", src: heroBg, z: -32, scale: 4.5, anchor: [0.0, -1.4, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "hero-mid", type: "mid", src: heroMid, z: -18, scale: 3.2, anchor: [0.0, -1.0, 0], opacity: 0.92, speed: 0.16, parallaxFactor: 0.18 },
-      { id: "hero-atmo", type: "atmo", src: heroAtmosphere, z: -8, scale: 2.2, opacity: 0.72, blend: "screen", drift: [0.015, 0.002], parallaxFactor: 0.35 },
-      { id: "hero-fgl", type: "fg", src: heroFgLeft, z: 1.8, scale: 0.92, anchor: [-1.45, -0.68, 0], opacity: 1, blur: 0.4, parallaxFactor: 2.1 },
-      { id: "hero-fgr", type: "fg", src: heroFgRight, z: 1.6, scale: 0.96, anchor: [1.42, -0.72, 0], opacity: 1, blur: 0.4, parallaxFactor: 2.3 },
+      {
+        id: "hero-horizon-far",
+        type: "horizon",
+        src: heroMid,
+        z: -28,
+        stripHeight: 0.56,
+        yOffset: -0.4,
+        opacity: 0.72,
+        speed: 0.08,
+        parallaxFactor: 0.14,
+      },
+      {
+        id: "hero-atmo-strip",
+        type: "atmo",
+        src: heroAtmosphere,
+        z: -15,
+        stripHeight: 0.44,
+        yOffset: -0.2,
+        opacity: 0.42,
+        blend: "screen",
+        drift: [0.008, 0.0],
+        parallaxFactor: 0.34,
+      },
     ],
-    particles: { count: 480, color: 0xffe6cb, size: 0.038, bounds: [-4, 4, -2, 3, -15, 3] },
+    particles: { count: 420, color: 0xffe6cb, size: 0.036 },
   },
 
   performance: {
@@ -57,15 +70,35 @@ export const WORLDS = {
     fillColor: 0x4878a8,
     fillIntensity: 2.6,
     fillPosition: [-4.0, 1.5, 3.5],
-    fogColor: 0x04070c,
-    fogNear: 8,
-    fogFar: 45,
+    fogColor: 0x050912,
+    fogNear: 12,
+    fogFar: 55,
     layers: [
-      { id: "perf-bg", type: "bg", src: perfBg, z: -28, scale: 3.4, opacity: 0.95, speed: 0.05, parallaxFactor: 0.06 },
-      { id: "perf-flow", type: "atmo", src: perfAirflow, z: -10, scale: 2.1, opacity: 0.65, blend: "additive", drift: [-0.02, 0.01], parallaxFactor: 0.38 },
-      { id: "perf-fg", type: "fg", src: perfFg, z: 2.0, scale: 1.1, anchor: [0.1, -0.85, 0], opacity: 0.95, blur: 0.3, parallaxFactor: 2.0 },
+      {
+        id: "perf-horizon",
+        type: "horizon",
+        src: perfBg,
+        z: -26,
+        stripHeight: 0.48,
+        yOffset: -0.5,
+        opacity: 0.45,
+        speed: 0.06,
+        parallaxFactor: 0.12,
+      },
+      {
+        id: "perf-flow",
+        type: "atmo",
+        src: perfAirflow,
+        z: -14,
+        stripHeight: 0.42,
+        yOffset: -0.1,
+        opacity: 0.34,
+        blend: "additive",
+        drift: [-0.012, 0.0],
+        parallaxFactor: 0.32,
+      },
     ],
-    particles: { count: 620, color: 0x64d2ff, size: 0.032, bounds: [-4, 4, -2, 3, -12, 3] },
+    particles: { count: 480, color: 0x64d2ff, size: 0.03 },
   },
 
   display: {
@@ -81,37 +114,66 @@ export const WORLDS = {
     fillColor: 0x6ca0d0,
     fillIntensity: 2.4,
     fillPosition: [-5.0, 2.0, 3.0],
-    fogColor: 0x050910,
-    fogNear: 10,
-    fogFar: 55,
+    fogColor: 0x07101c,
+    fogNear: 12,
+    fogFar: 58,
     layers: [
-      { id: "disp-bg", type: "bg", src: displayBg, z: -30, scale: 4.8, anchor: [0.0, -1.5, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "disp-fg", type: "fg", src: displayFg, z: 1.9, scale: 1.05, anchor: [0.05, -0.88, 0], opacity: 1, blur: 0.35, parallaxFactor: 2.15 },
+      {
+        id: "disp-horizon",
+        type: "horizon",
+        src: displayBg,
+        z: -26,
+        stripHeight: 0.50,
+        yOffset: -0.4,
+        opacity: 0.55,
+        speed: 0.06,
+        parallaxFactor: 0.14,
+      },
     ],
-    particles: { count: 420, color: 0xd8eeff, size: 0.035, bounds: [-4, 4, -2, 3, -14, 3] },
+    particles: { count: 360, color: 0xd8eeff, size: 0.032 },
   },
 
   mobility: {
     id: "mobility",
     name: "Architectural Rigor",
-    ambientLight: 0.98,
-    keyColor: 0xf4f8fc,
-    keyIntensity: 2.6,
+    ambientLight: 0.94,
+    keyColor: 0xeaf2fa,
+    keyIntensity: 2.8,
     keyPosition: [3.8, 4.2, 5.0],
-    rimColor: 0xd8e4ee,
-    rimIntensity: 1.6,
+    rimColor: 0x9ec0de,
+    rimIntensity: 1.9,
     rimPosition: [-6.0, 2.5, -4.0],
-    fillColor: 0xa8c2d8,
-    fillIntensity: 2.2,
+    fillColor: 0x6c88a4,
+    fillIntensity: 2.3,
     fillPosition: [-4.5, 1.8, 2.8],
-    fogColor: 0xd2dce6,
+    fogColor: 0x101822,
     fogNear: 12,
     fogFar: 60,
     layers: [
-      { id: "mob-bg", type: "bg", src: mobilityBg, z: -30, scale: 4.8, anchor: [0.0, -1.4, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "mob-arch", type: "mid", src: mobilityArch, z: -14, scale: 2.5, anchor: [0.35, -0.4, 0], opacity: 0.88, speed: 0.22, parallaxFactor: 0.28 },
+      {
+        id: "mob-horizon",
+        type: "horizon",
+        src: mobilityBg,
+        z: -28,
+        stripHeight: 0.46,
+        yOffset: -0.5,
+        opacity: 0.34,
+        speed: 0.05,
+        parallaxFactor: 0.12,
+      },
+      {
+        id: "mob-arch-strip",
+        type: "mid",
+        src: mobilityArch,
+        z: -16,
+        stripHeight: 0.42,
+        yOffset: -0.3,
+        opacity: 0.38,
+        speed: 0.18,
+        parallaxFactor: 0.28,
+      },
     ],
-    particles: { count: 320, color: 0x88a2bc, size: 0.03, bounds: [-4, 4, -2, 3, -12, 3] },
+    particles: { count: 280, color: 0xa4c0dc, size: 0.028 },
   },
 
   design: {
@@ -127,14 +189,23 @@ export const WORLDS = {
     fillColor: 0x547290,
     fillIntensity: 2.4,
     fillPosition: [-5.2, 2.0, 3.2],
-    fogColor: 0x05070a,
-    fogNear: 9,
-    fogFar: 50,
+    fogColor: 0x06080d,
+    fogNear: 11,
+    fogFar: 54,
     layers: [
-      { id: "des-bg", type: "bg", src: perfBg, z: -32, scale: 4.8, anchor: [0.0, -1.5, 0], opacity: 0.65, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "des-fg", type: "fg", src: perfFg, z: 2.1, scale: 1.05, anchor: [0.2, -0.9, 0], opacity: 0.85, blur: 0.4, parallaxFactor: 2.05 },
+      {
+        id: "des-horizon",
+        type: "horizon",
+        src: perfBg,
+        z: -28,
+        stripHeight: 0.44,
+        yOffset: -0.5,
+        opacity: 0.32,
+        speed: 0.05,
+        parallaxFactor: 0.12,
+      },
     ],
-    particles: { count: 380, color: 0xffaa66, size: 0.028, bounds: [-4, 4, -2, 3, -12, 3] },
+    particles: { count: 320, color: 0xffb878, size: 0.026 },
   },
 
   final: {
@@ -151,12 +222,21 @@ export const WORLDS = {
     fillIntensity: 2.5,
     fillPosition: [-5.5, 2.0, 3.0],
     fogColor: 0x070b12,
-    fogNear: 11,
+    fogNear: 12,
     fogFar: 65,
     layers: [
-      { id: "fin-bg", type: "bg", src: finalBg, z: -30, scale: 5.2, anchor: [0.0, -1.8, 0], opacity: 1, speed: 0.04, parallaxFactor: 0.05 },
-      { id: "fin-fg", type: "fg", src: finalFg, z: 1.85, scale: 1.08, anchor: [0.0, -0.84, 0], opacity: 1, blur: 0.38, parallaxFactor: 2.2 },
+      {
+        id: "fin-horizon",
+        type: "horizon",
+        src: finalBg,
+        z: -26,
+        stripHeight: 0.54,
+        yOffset: -0.4,
+        opacity: 0.62,
+        speed: 0.06,
+        parallaxFactor: 0.14,
+      },
     ],
-    particles: { count: 520, color: 0xffcf9e, size: 0.034, bounds: [-4, 4, -2, 3, -15, 3] },
+    particles: { count: 440, color: 0xffcf9e, size: 0.032 },
   },
 };

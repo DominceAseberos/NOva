@@ -1,6 +1,40 @@
 import * as THREE from "three";
 import { WORLDS } from "./novaWorlds.js";
 
+/**
+ * Generates a vertical linear-gradient alpha mask texture so every bottom-anchored
+ * parallax horizon strip smoothly melts upward into the continuous gradient sky
+ * with zero hard horizontal edges.
+ */
+function createHorizonFadeAlphaMap() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 4;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+
+  const grad = ctx.createLinearGradient(0, 0, 0, 256);
+  // Both top (0.0) and bottom (1.0) fade smoothly to exact 0% opacity so every
+  // horizon strip melts seamlessly into the continuous linear-gradient backdrop
+  // with zero hard horizontal cutoffs.
+  grad.addColorStop(0.0, "rgba(0, 0, 0, 1)");
+  grad.addColorStop(0.10, "rgba(22, 22, 22, 1)");
+  grad.addColorStop(0.28, "rgba(140, 140, 140, 1)");
+  grad.addColorStop(0.46, "rgba(255, 255, 255, 1)");
+  grad.addColorStop(0.68, "rgba(255, 255, 255, 1)");
+  grad.addColorStop(0.84, "rgba(110, 110, 110, 1)");
+  grad.addColorStop(0.95, "rgba(18, 18, 18, 1)");
+  grad.addColorStop(1.0, "rgba(0, 0, 0, 1)");
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 4, 256);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 export class DepthStage {
   constructor(scene, camera, renderer) {
     this.scene = scene;
@@ -12,12 +46,12 @@ export class DepthStage {
     this.scene.add(this.stageRoot);
 
     this.textureLoader = new THREE.TextureLoader();
+    this.horizonAlphaMap = createHorizonFadeAlphaMap();
     this.worldNodes = new Map();
-    this.particlesByWorld = new Map();
 
     this.activeWorldId = "top";
     this.targetWorldId = "top";
-    this.transitionProgress = 1; // 0 to 1
+    this.transitionProgress = 1;
 
     this.baseCamPos = new THREE.Vector3(0, 1.05, 4.35);
     this.lastCamPos = new THREE.Vector3().copy(this.baseCamPos);
@@ -27,9 +61,51 @@ export class DepthStage {
     this.setupDepthInspectionHook();
   }
 
-  initWorlds() {
+  /**
+   * Sizes a bottom-anchored horizon strip preserving exact native texture aspect ratio
+   * (zero horizontal stretching) while ensuring comfortable horizontal overscan.
+   */
+  fitHorizonStrip(mesh, texAspect) {
+    const u = mesh.userData;
     const fov = 34;
-    const aspect = Math.max(1, window.innerWidth / Math.max(1, window.innerHeight));
+    const viewportAspect = Math.max(
+      0.6,
+      window.innerWidth / Math.max(1, window.innerHeight)
+    );
+    const zDist = Math.abs(u.baseZ - this.baseCamPos.z);
+    const frustumH = 2 * zDist * Math.tan((fov * Math.PI) / 360);
+    const frustumW = frustumH * viewportAspect;
+
+    // Target strip height as a fraction of viewport height (sits cleanly at bottom, NOT fullscreen)
+    const targetH = frustumH * (u.stripHeight || 0.48);
+    let planeH = targetH;
+    let planeW = planeH * texAspect;
+
+    // Ensure horizontal overscan (>= 1.28x viewport width) by scaling BOTH axes uniformly
+    // so image aspect ratio is 100% preserved and never stretched.
+    const minRequiredW = frustumW * 1.28;
+    if (planeW < minRequiredW) {
+      const uniformScale = minRequiredW / Math.max(0.001, planeW);
+      planeW *= uniformScale;
+      planeH *= uniformScale;
+    }
+
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.PlaneGeometry(planeW, planeH);
+
+    // Anchor cleanly along the lower band of the camera's actual downward sightline
+    // so the scenic horizon strip rises organically from the bottom without clipping.
+    const raySlope = (-0.05 - this.baseCamPos.y) / (0 - this.baseCamPos.z);
+    const sightlineY = this.baseCamPos.y + raySlope * (u.baseZ - this.baseCamPos.z);
+    u.baseY = sightlineY - frustumH * 0.14 + (u.yOffset || 0);
+    mesh.position.y = u.baseY;
+  }
+
+  initWorlds() {
+    const maxAnisotropy = Math.min(
+      8,
+      this.renderer?.capabilities?.getMaxAnisotropy?.() || 4
+    );
 
     for (const [worldId, def] of Object.entries(WORLDS)) {
       const worldGroup = new THREE.Group();
@@ -40,22 +116,12 @@ export class DepthStage {
       const layerMeshes = [];
 
       for (const layerDef of def.layers) {
-        const zDist = Math.abs(layerDef.z);
-        // Generous overscan for background & midground to prevent exposed seams on camera pitch
-        const overscan = layerDef.type === "bg" ? 2.5 : layerDef.type === "mid" ? 2.1 : 1.45;
-        const frustumH = 2 * zDist * Math.tan((fov * Math.PI) / 360) * overscan;
-        const frustumW = frustumH * aspect * (layerDef.scale || 1.0);
-
-        const geo = new THREE.PlaneGeometry(frustumW, frustumH);
-        const tex = this.textureLoader.load(layerDef.src);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.generateMipmaps = true;
-        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        const geo = new THREE.PlaneGeometry(1, 1);
 
         const mat = new THREE.MeshBasicMaterial({
-          map: tex,
           transparent: true,
-          opacity: layerDef.opacity ?? 1,
+          opacity: layerDef.opacity ?? 0.6,
+          alphaMap: this.horizonAlphaMap,
           depthWrite: false,
           toneMapped: true,
         });
@@ -66,33 +132,41 @@ export class DepthStage {
 
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.z = layerDef.z;
-        if (layerDef.anchor) {
-          mesh.position.x = layerDef.anchor[0];
-          mesh.position.y = layerDef.anchor[1];
-        } else if (layerDef.type === "bg") {
-          // Center along downward camera sightline
-          mesh.position.y = -1.8;
-        }
+        mesh.renderOrder = -10;
 
-        // Store base reference
         mesh.userData = {
           id: layerDef.id,
           type: layerDef.type,
           baseZ: layerDef.z,
-          baseX: mesh.position.x,
-          baseY: mesh.position.y,
-          parallaxFactor: layerDef.parallaxFactor || 0.1,
+          baseX: 0,
+          baseY: -2.0,
+          stripHeight: layerDef.stripHeight || 0.48,
+          yOffset: layerDef.yOffset || 0,
+          parallaxFactor: layerDef.parallaxFactor || 0.14,
           speed: layerDef.speed || 0.1,
           drift: layerDef.drift || [0, 0],
-          targetOpacity: layerDef.opacity ?? 1,
+          targetOpacity: layerDef.opacity ?? 0.6,
+          texAspect: 16 / 9,
         };
 
-        // Foreground layers render in front of standard scene depth
-        if (layerDef.type === "fg") {
-          mesh.renderOrder = 8;
-        } else {
-          mesh.renderOrder = -10;
-        }
+        // Initial sizing with 16:9 default before texture finishes decoding
+        this.fitHorizonStrip(mesh, 16 / 9);
+
+        const tex = this.textureLoader.load(layerDef.src, (loadedTex) => {
+          const img = loadedTex.image;
+          if (img && img.width && img.height) {
+            const aspect = img.width / img.height;
+            mesh.userData.texAspect = aspect;
+            this.fitHorizonStrip(mesh, aspect);
+          }
+        });
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.anisotropy = maxAnisotropy;
+        mat.map = tex;
+        mat.needsUpdate = true;
 
         worldGroup.add(mesh);
         layerMeshes.push(mesh);
@@ -103,8 +177,16 @@ export class DepthStage {
     }
   }
 
+  resize() {
+    for (const node of this.worldNodes.values()) {
+      for (const mesh of node.layers) {
+        this.fitHorizonStrip(mesh, mesh.userData.texAspect || 16 / 9);
+      }
+    }
+  }
+
   initGlobalParticles() {
-    const pCount = 500;
+    const pCount = 420;
     const pGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(pCount * 3);
     const speeds = new Float32Array(pCount * 3);
@@ -112,26 +194,25 @@ export class DepthStage {
     for (let i = 0; i < pCount; i++) {
       positions[i * 3 + 0] = (Math.random() - 0.5) * 12;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 6;
-      // Confined strictly behind the laptop (z <= -0.6) so dust motes never
+      // Confined strictly behind the laptop (z <= -2) so dust motes never
       // clip through the camera lens or occlude the product during macro inspection.
-      positions[i * 3 + 2] = -22 + Math.random() * 20; // z from -22 to -2
+      positions[i * 3 + 2] = -22 + Math.random() * 20;
 
-      speeds[i * 3 + 0] = (Math.random() - 0.5) * 0.003;
-      speeds[i * 3 + 1] = 0.001 + Math.random() * 0.004; // gentle upward thermal drift
-      speeds[i * 3 + 2] = (Math.random() - 0.5) * 0.002;
+      speeds[i * 3 + 0] = (Math.random() - 0.5) * 0.0025;
+      speeds[i * 3 + 1] = 0.001 + Math.random() * 0.0035;
+      speeds[i * 3 + 2] = (Math.random() - 0.5) * 0.0015;
     }
 
     pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     pGeo.setAttribute("velocity", new THREE.BufferAttribute(speeds, 3));
 
-    // Feathered circle particle texture
     const pCanvas = document.createElement("canvas");
     pCanvas.width = 64;
     pCanvas.height = 64;
     const ctx = pCanvas.getContext("2d");
     const grad = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
-    grad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-    grad.addColorStop(0.3, "rgba(230, 245, 255, 0.6)");
+    grad.addColorStop(0, "rgba(255, 255, 255, 0.92)");
+    grad.addColorStop(0.3, "rgba(230, 245, 255, 0.55)");
     grad.addColorStop(1, "rgba(200, 225, 255, 0)");
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 64, 64);
@@ -139,9 +220,9 @@ export class DepthStage {
     const pTex = new THREE.CanvasTexture(pCanvas);
     const pMat = new THREE.PointsMaterial({
       map: pTex,
-      size: 0.045,
+      size: 0.04,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.48,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -159,16 +240,22 @@ export class DepthStage {
   }
 
   update(dt, camera, state = {}, lights = {}) {
-    // Dynamic world transition cross-fade
     if (this.transitionProgress < 1) {
-      this.transitionProgress = Math.min(1, this.transitionProgress + dt * 2.4);
+      this.transitionProgress = Math.min(1, this.transitionProgress + dt * 2.2);
     }
 
     const t = this.transitionProgress;
     const camDeltaX = camera.position.x - this.baseCamPos.x;
     const camDeltaY = camera.position.y - this.baseCamPos.y;
 
-    // Update each world's visibility and multi-plane parallax
+    // Smoothly dissolve scenic horizon strips when zooming into macro hardware close-ups
+    // so macro chapters sit on a pure, distraction-free studio gradient.
+    const camZ = camera.position.z;
+    const prodScale = state.scale ?? 1;
+    const distFade = THREE.MathUtils.clamp((camZ - 2.95) / 1.05, 0, 1);
+    const scaleFade = THREE.MathUtils.clamp((1.22 - prodScale) / 0.34, 0, 1);
+    const macroStripFade = Math.min(distFade, scaleFade);
+
     for (const [wId, node] of this.worldNodes.entries()) {
       let worldWeight = 0;
       if (wId === this.targetWorldId) {
@@ -177,25 +264,17 @@ export class DepthStage {
         worldWeight = 1 - t;
       }
 
-      node.group.visible = worldWeight > 0.005;
+      const effectiveWeight = worldWeight * macroStripFade;
+      node.group.visible = effectiveWeight > 0.005;
       if (!node.group.visible) continue;
 
       for (const mesh of node.layers) {
         const u = mesh.userData;
-        let layerAlpha = u.targetOpacity * worldWeight;
-        if (u.type === "fg") {
-          // Macro proximity fade: ensure foreground bokeh planes never clip or occlude when camera is close
-          const camZ = camera.position.z;
-          const fgClearance = camZ - mesh.position.z;
-          const fgFade = THREE.MathUtils.clamp((fgClearance - 0.45) / 0.85, 0, 1);
-          layerAlpha *= fgFade;
-        }
-        mesh.material.opacity = layerAlpha;
+        mesh.material.opacity = u.targetOpacity * effectiveWeight;
 
-        // Monotonic mathematical parallax:
-        // L0/L1 move with subtle counter-shift; L4 moves fast across view
-        const px = camDeltaX * u.parallaxFactor * 0.28;
-        const py = camDeltaY * u.parallaxFactor * 0.22;
+        // Monotonic optical parallax: far horizon shifts gently, midground shifts faster
+        const px = camDeltaX * u.parallaxFactor * 0.32;
+        const py = camDeltaY * u.parallaxFactor * 0.24;
 
         mesh.position.x = u.baseX - px;
         mesh.position.y = u.baseY - py;
@@ -203,28 +282,27 @@ export class DepthStage {
         if (u.drift[0] !== 0 || u.drift[1] !== 0) {
           u.baseX += u.drift[0] * dt;
           u.baseY += u.drift[1] * dt;
-          // Wrap atmospheric drift
-          if (Math.abs(u.baseX) > 2.5) u.baseX = -u.baseX;
+          if (Math.abs(u.baseX) > 2.0) u.baseX = -u.baseX;
         }
       }
     }
 
-    // Adapt lights to active world lighting definition
+    // Adapt lights smoothly to active world palette
     const activeDef = WORLDS[this.targetWorldId] || WORLDS.top;
     if (lights.key && activeDef.keyColor) {
-      lights.key.color.lerp(new THREE.Color(activeDef.keyColor), dt * 3.5);
+      lights.key.color.lerp(new THREE.Color(activeDef.keyColor), dt * 3.2);
     }
     if (lights.rim && activeDef.rimColor) {
-      lights.rim.color.lerp(new THREE.Color(activeDef.rimColor), dt * 3.5);
+      lights.rim.color.lerp(new THREE.Color(activeDef.rimColor), dt * 3.2);
     }
     if (lights.fill && activeDef.fillColor) {
-      lights.fill.color.lerp(new THREE.Color(activeDef.fillColor), dt * 3.5);
+      lights.fill.color.lerp(new THREE.Color(activeDef.fillColor), dt * 3.2);
     }
     if (this.scene.fog && activeDef.fogColor) {
-      this.scene.fog.color.lerp(new THREE.Color(activeDef.fogColor), dt * 2.5);
+      this.scene.fog.color.lerp(new THREE.Color(activeDef.fogColor), dt * 2.4);
     }
 
-    // Animate volumetric dust motes
+    // Animate background volumetric dust motes
     if (this.particleSystem) {
       const posAttr = this.particleSystem.geometry.attributes.position;
       const velAttr = this.particleSystem.geometry.attributes.velocity;
@@ -239,17 +317,23 @@ export class DepthStage {
         pos[i + 1] += vel[i + 1] * (dt * 60) - camMoveY * 0.12;
         pos[i + 2] += vel[i + 2] * (dt * 60);
 
-        // Particle volume boundary wrap
         if (pos[i + 1] > 3.5) pos[i + 1] = -2.5;
         if (pos[i + 0] > 6) pos[i + 0] = -6;
         if (pos[i + 0] < -6) pos[i + 0] = 6;
       }
       posAttr.needsUpdate = true;
 
-      // Softly attenuate particle opacity when camera moves into macro close-up
-      const currentCamDist = Math.hypot(camera.position.x, camera.position.y - 1.0, camera.position.z);
-      const macroParticleFade = THREE.MathUtils.clamp((currentCamDist - 2.8) / 1.2, 0.2, 1.0);
-      this.particleSystem.material.opacity = 0.55 * macroParticleFade;
+      const currentCamDist = Math.hypot(
+        camera.position.x,
+        camera.position.y - 1.0,
+        camera.position.z
+      );
+      const macroParticleFade = THREE.MathUtils.clamp(
+        (currentCamDist - 2.8) / 1.2,
+        0.18,
+        1.0
+      );
+      this.particleSystem.material.opacity = 0.48 * macroParticleFade;
     }
     this.lastCamPos.copy(camera.position);
   }
@@ -271,6 +355,9 @@ export class DepthStage {
 
         return {
           world: this.targetWorldId,
+          camX: this.camera.position.x,
+          camY: this.camera.position.y,
+          camZ: this.camera.position.z,
           layers,
         };
       },
@@ -278,19 +365,18 @@ export class DepthStage {
   }
 
   dispose() {
-    if (window.__novaDepth) delete window.__novaDepth;
-    this.stageRoot.traverse((obj) => {
-      if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
-        else obj.material.dispose();
+    this.horizonAlphaMap?.dispose();
+    for (const node of this.worldNodes.values()) {
+      for (const mesh of node.layers) {
+        mesh.geometry.dispose();
+        mesh.material.map?.dispose();
+        mesh.material.dispose();
       }
-    });
+    }
     if (this.particleSystem) {
       this.particleSystem.geometry.dispose();
+      this.particleSystem.material.map?.dispose();
       this.particleSystem.material.dispose();
-      this.scene.remove(this.particleSystem);
     }
-    this.scene.remove(this.stageRoot);
   }
 }

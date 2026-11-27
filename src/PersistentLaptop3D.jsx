@@ -1442,6 +1442,7 @@ export default function PersistentLaptop3D() {
       cameraTarget.set(0, width < 820 ? -0.15 : -0.08, 0);
       camera.lookAt(cameraTarget);
       camera.updateProjectionMatrix();
+      depthStage.resize();
     };
 
     resize();

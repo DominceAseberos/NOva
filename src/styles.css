@@ -57,9 +57,28 @@ img {
 .app-shell {
   position: relative;
   overflow: clip;
+  /* Continuous seamless vertical linear-gradient strip spanning all 6 acts:
+     eliminates hard horizontal section seams and stretched fullscreen bg images. */
   background:
-    radial-gradient(circle at 20% 0%, rgba(37, 55, 77, 0.12), transparent 35%),
-    var(--bg);
+    radial-gradient(ellipse 90% 18% at 78% 4%, rgba(164, 198, 238, 0.14), transparent 72%),
+    radial-gradient(ellipse 70% 14% at 24% 28%, rgba(44, 132, 196, 0.10), transparent 70%),
+    radial-gradient(ellipse 80% 16% at 72% 52%, rgba(92, 146, 208, 0.11), transparent 72%),
+    radial-gradient(ellipse 75% 15% at 68% 72%, rgba(120, 146, 178, 0.10), transparent 70%),
+    radial-gradient(ellipse 70% 14% at 76% 92%, rgba(196, 142, 92, 0.10), transparent 70%),
+    linear-gradient(
+      180deg,
+      #101926 0%,
+      #0a111c 11%,
+      #050a14 22%,
+      #040811 34%,
+      #081424 46%,
+      #0c1a2c 56%,
+      #15202e 66%,
+      #101722 74%,
+      #090b10 83%,
+      #0b0d12 91%,
+      #05070b 100%
+    );
 }
 
 .persistent-product {
@@ -377,7 +396,7 @@ a:focus-visible .arrow {
 .hero-scroll {
   position: relative;
   min-height: 188vh;
-  background: #05070a;
+  background: transparent;
 }
 
 .hero-stage {
@@ -387,7 +406,7 @@ a:focus-visible .arrow {
   height: 100svh;
   min-height: 650px;
   overflow: hidden;
-  background: #090e14;
+  background: transparent;
   pointer-events: none;
 }
 
@@ -763,7 +782,7 @@ a:focus-visible .arrow {
 
 .scene--display {
   min-height: 150svh;
-  background: #09111a;
+  background: transparent;
 }
 
 .display-bg {
@@ -829,8 +848,8 @@ a:focus-visible .arrow {
 
 .scene--mobility {
   min-height: 150svh;
-  background: #cfd9e2;
-  color: #0d141b;
+  background: transparent;
+  color: var(--text);
 }
 
 .mobility-bg {
@@ -1013,7 +1032,7 @@ a:focus-visible .arrow {
 
 .scene--final {
   min-height: 145svh;
-  background: #090b0f;
+  background: transparent;
 }
 
 .final-bg {
@@ -1630,15 +1649,15 @@ a:focus-visible .arrow {
 }
 
 /* Preserve a clean editorial copy column even during aggressive macro shots.
-   The veil sits above the WebGL product but below all story text/callouts. */
+   Soft feathered veil sits above the WebGL product but below all story text/callouts. */
 .story-stack::before {
   content: "";
   position: absolute;
   z-index: 0;
   inset: 0 auto 0 0;
-  width: min(52vw, 720px);
+  width: min(48vw, 660px);
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(3,7,11,0.95) 0%, rgba(3,7,11,0.84) 56%, rgba(3,7,11,0.30) 84%, transparent 100%);
+  background: linear-gradient(90deg, rgba(4, 7, 12, 0.74) 0%, rgba(4, 7, 12, 0.48) 52%, rgba(4, 7, 12, 0.12) 82%, transparent 100%);
 }
 
 .story-stack--dark::before {
@@ -1719,6 +1738,7 @@ a:focus-visible .arrow {
   font-size: clamp(1.25rem, 1.8vw, 2.05rem);
   font-weight: 500;
   letter-spacing: -0.04em;
+  color: #f4f6f8;
 }
 
 .story-metrics span {
@@ -1865,11 +1885,11 @@ body[data-story-chapter="NOVA"] [data-story-panel="NOVA"] {
 }
 
 .scene--mobility {
-  color: #0a1118;
+  color: var(--text);
 }
 
 .scene--design {
-  background: #070a0e;
+  background: transparent;
 }
 
 .final-film-shade {

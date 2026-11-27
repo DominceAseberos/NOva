@@ -31,17 +31,6 @@ const ScrollStoryEditor = import.meta.env.DEV
   ? lazy(() => import("./scroll-story/editor/ScrollStoryEditor.jsx"))
   : null;
 
-import heroBg from "../assets/hero/hero-background.webp";
-import heroAtmosphere from "../assets/web/hero-atmosphere.webp";
-import heroFgLeft from "../assets/web/hero-foreground-left.webp";
-import heroFgRight from "../assets/web/hero-foreground-right.webp";
-
-import perfBg from "../assets/performance/performance-background.webp";
-import displayBg from "../assets/display/display-background.webp";
-import mobilityBg from "../assets/mobility/mobility-background.webp";
-import mobilityArch from "../assets/web/mobility-architecture.webp";
-import finalBg from "../assets/final/final-background.webp";
-
 gsap.registerPlugin(ScrollTrigger);
 
 const Arrow = ({ direction = "right" }) => (
@@ -171,22 +160,6 @@ function Hero() {
   return (
     <section className="hero-scroll" id="top">
       <div className="hero-stage" ref={stageRef}>
-        <img
-          src={heroBg}
-          alt=""
-          className="hero-layer hero-bg"
-          aria-hidden="true"
-          fetchPriority="high"
-          decoding="async"
-        />
-        <img
-          src={heroAtmosphere}
-          alt=""
-          className="hero-layer hero-atmosphere"
-          aria-hidden="true"
-          decoding="async"
-        />
-
         <div className="hero-copy">
           <p className="eyebrow">NOVA / PROFESSIONAL COMPUTING</p>
           <h1>
@@ -217,19 +190,6 @@ function Hero() {
         <div className="hero-word-front" aria-hidden="true">
           WITHOUT
         </div>
-
-        <img
-          src={heroFgLeft}
-          alt=""
-          className="hero-layer hero-fg hero-fg--left"
-          aria-hidden="true"
-        />
-        <img
-          src={heroFgRight}
-          alt=""
-          className="hero-layer hero-fg hero-fg--right"
-          aria-hidden="true"
-        />
 
         <div className="hero-vignette" aria-hidden="true" />
 
@@ -358,7 +318,6 @@ function Performance() {
   return (
     <section className="scene scene--performance scene--product-film" id="performance">
       <div className="scene-stage">
-        <img className="scene-bg scene-bg--perf" src={perfBg} alt="" decoding="async" />
         <div className="product-film-bg product-film-bg--dark" />
         <div className="product-film-grid" aria-hidden="true" />
         <div className="story-stack">
@@ -417,7 +376,6 @@ function Display() {
   return (
     <section className="scene scene--display scene--product-film" id="display">
       <div className="scene-stage">
-        <img className="scene-bg scene-bg--display" src={displayBg} alt="" decoding="async" />
         <div className="product-film-bg product-film-bg--blue" />
         <div className="product-film-grid" aria-hidden="true" />
         <div className="story-stack">
@@ -468,14 +426,12 @@ function Mobility() {
   return (
     <section className="scene scene--mobility scene--product-film" id="mobility">
       <div className="scene-stage">
-        <img className="scene-bg scene-bg--mobility" src={mobilityBg} alt="" decoding="async" />
-        <img className="mobility-architecture scene-parallax-arch" src={mobilityArch} alt="" decoding="async" />
         <div className="product-film-bg product-film-bg--silver" />
-        <div className="product-film-grid product-film-grid--dark" aria-hidden="true" />
-        <div className="story-stack story-stack--dark">
+        <div className="product-film-grid" aria-hidden="true" />
+        <div className="story-stack">
           {panels.map((panel) => <StoryPanel key={panel.chapter} {...panel} />)}
         </div>
-        <div className="scene-index scene-index--dark">04 / 06 · HARDWARE</div>
+        <div className="scene-index">04 / 06 · HARDWARE</div>
       </div>
     </section>
   );
@@ -551,7 +507,6 @@ function FinalScene() {
   return (
     <section className="scene scene--final scene--product-film" id="final">
       <div className="scene-stage">
-        <img className="scene-bg final-bg" src={finalBg} alt="" decoding="async" />
         <div className="final-film-shade" />
         <div className="story-stack">
           {panels.map((panel) => <StoryPanel key={panel.chapter} {...panel} />)}
